@@ -149,7 +149,7 @@ export default function HomePage({ onOpenVideo }) {
         </ul>
       </section>
 
-      {/* SECTION 3: Welcome to Patches4Less! + Video + Choose Your Patch Type */}
+      {/* SECTION 3: Welcome to Patch4Ever! + Video + Choose Your Patch Type */}
       <section className="mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6">
         <div className="mb-10 flex justify-center drop-shadow-md">
           <img
@@ -171,7 +171,7 @@ export default function HomePage({ onOpenVideo }) {
           {/* Left Column */}
           <div className="lg:col-span-6">
             <h2 className="m-0 font-heading text-5xl leading-none font-black text-primary-700 md:text-6xl dark:text-primary-300">
-              Welcome to Patches4Less!
+              Welcome to Patch4Ever!
             </h2>
             <p className="mt-2 font-heading text-3xl font-bold text-primary-600 dark:text-primary-400">
               Custom patches since 2003
@@ -345,7 +345,7 @@ export default function HomePage({ onOpenVideo }) {
             We Make Custom Patches for Every Purpose
           </h2>
           <p className="mt-4 text-base leading-relaxed text-neutral-700 sm:text-lg dark:text-neutral-300">
-            Custom patches are incredibly versatile, perfect for enhancing team identity, boosting business branding, decorating uniforms, commemorating events, or encouraging unity in military units, motorcycle clubs, and more. At Patches4Less.com, we specialize in creating personalized patches for every need. From design to delivery, we make it easy to bring your vision to life.
+            Custom patches are incredibly versatile, perfect for enhancing team identity, boosting business branding, decorating uniforms, commemorating events, or encouraging unity in military units, motorcycle clubs, and more. At Patch4Ever.com, we specialize in creating personalized patches for every need. From design to delivery, we make it easy to bring your vision to life.
           </p>
         </div>
 
@@ -422,7 +422,7 @@ export default function HomePage({ onOpenVideo }) {
               Ordering Custom Patches is as easy as 1-2-3!
             </h2>
             <p className="mt-4 text-base leading-relaxed text-neutral-700 sm:text-lg dark:text-neutral-300">
-              At Patches4Less.com, we pride ourselves on making the process of ordering custom patches as simple and straightforward as possible. In just three easy steps, you&apos;ll be on your way to receiving your own unique, high-quality patches.
+              At Patch4Ever.com, we pride ourselves on making the process of ordering custom patches as simple and straightforward as possible. In just three easy steps, you&apos;ll be on your way to receiving your own unique, high-quality patches.
             </p>
           </div>
 
@@ -498,17 +498,17 @@ export default function HomePage({ onOpenVideo }) {
             <img
               src={ASSETS.lowPricesWhite}
               alt="Low Prices Guaranteed Every Day"
-              title="At Patches4less.com we always guarantee the lowest price"
+              title="At Patch4Ever.com we always guarantee the lowest price"
               className="guarantee-badge mx-auto w-52 drop-shadow-xl md:w-64"
             />
           </div>
         </div>
       </aside>
 
-      {/* SECTION 8: Why Choose Patches4Less.com? */}
+      {/* SECTION 8: Why Choose Patch4Ever.com? */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <h2 className="m-0 text-center font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent">
-          Why Choose Patches4Less.com?
+          Why Choose Patch4Ever.com?
         </h2>
 
         <div className="mt-12 space-y-16">

@@ -175,7 +175,7 @@ export default function Footer() {
             {/* Social Icons */}
             <div className="flex items-start gap-3 lg:col-span-1 lg:justify-end">
               <a
-                href="https://www.facebook.com/Patches4Less"
+                href="https://www.facebook.com/Patch4Ever"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
@@ -186,7 +186,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://www.instagram.com/patches4less"
+                href="https://www.instagram.com/patch4ever"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
@@ -199,7 +199,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://www.youtube.com/@Patches4Less"
+                href="https://www.youtube.com/@Patch4Ever"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Youtube"
@@ -210,7 +210,7 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://x.com/patches4less"
+                href="https://x.com/patch4ever"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X"

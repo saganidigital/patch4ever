@@ -41,7 +41,7 @@ function AppShell() {
       const next = !prev
       document.documentElement.classList.toggle('dark', next)
       try {
-        localStorage.setItem('p4l-theme', next ? 'dark' : 'light')
+        localStorage.setItem('p4e-theme', next ? 'dark' : 'light')
       } catch {
         // ignore storage errors
       }

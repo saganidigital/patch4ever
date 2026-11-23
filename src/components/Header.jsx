@@ -125,7 +125,7 @@ export default function Header({ darkMode, onToggleDark, cartCount, onOpenCart }
           }`}
         >
           <div className="mx-auto flex h-[71px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-            <Link to="/" className="flex min-h-11 shrink-0 items-center rounded-md" aria-label="Patches4Less home">
+            <Link to="/" className="flex min-h-11 shrink-0 items-center rounded-md" aria-label="Patch4Ever home">
               <Logo className="h-8 w-auto text-white sm:h-10" />
             </Link>
 
@@ -364,7 +364,7 @@ export default function Header({ darkMode, onToggleDark, cartCount, onOpenCart }
         }`}
       >
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link to="/" className="flex items-center" aria-label="Patches4Less home">
+          <Link to="/" className="flex items-center" aria-label="Patch4Ever home">
             <Logo className="h-8 w-auto text-white" />
           </Link>
 

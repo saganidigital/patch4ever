@@ -1,4 +1,4 @@
-// Exact pricing tables captured from https://www.patches4less.com/pricing
+// Exact pricing tables for Patch4Ever
 
 export const EMBROIDERED_QTY_TIERS = [10, 20, 50, 100, 200, 300, 500, 1000, 2000]
 export const EMBROIDERED_SIZES = ['1.00', '1.50', '2.00', '2.50', '3.00', '3.50', '4.00', '4.50', '5.00', '5.50', '6.00', '6.50', '7.00']

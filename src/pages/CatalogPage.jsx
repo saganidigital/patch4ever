@@ -51,13 +51,13 @@ const ROUTE_CONTENT = {
   },
   '/contact': {
     eyebrow: 'GET IN TOUCH',
-    title: 'Contact Patches4Less',
+    title: 'Contact Patch4Ever',
     subtitle: 'Reach our Ocala, Florida patch specialists by phone, email, or message.',
     image: ASSETS.lowPricesWhite,
   },
   '/about': {
     eyebrow: 'SINCE 2003',
-    title: 'About Patches4Less.com',
+    title: 'About Patch4Ever.com',
     subtitle: 'Over twenty years crafting millions of custom patches for military units, first responders, Fortune 500 brands, and clubs.',
     image: ASSETS.step3Patch,
   },

@@ -1,7 +1,7 @@
 import { ASSETS } from './assets'
 
 export const CONTACT = {
-  email: 'sales@patches4less.com',
+  email: 'sales@patch4ever.com',
   phone: '1 866-847-2824',
   phoneHref: 'tel:+1-866-847-2824',
   hours: 'Monday - Friday 8am-5pm EST',
@@ -246,10 +246,10 @@ export const WHY_CHOOSE_ROWS = [
     image: ASSETS.bestPrice,
     alt: 'PVC patch in the shape of a price tag with the text Best Price in bold white letters, featuring a teal and orange color scheme',
     paragraphs: [
-      'At Patches4Less.com, we are committed to providing top-notch custom patches without straining your budget. Our expertise is dedicated solely to crafting patches that meet your group’s design specifications.',
+      'At Patch4Ever.com, we are committed to providing top-notch custom patches without straining your budget. Our expertise is dedicated solely to crafting patches that meet your group’s design specifications.',
       'With over twenty years of experience and having produced millions of custom patches, we have the expertise and capability to cater to a wide array of clients. Our clientele includes Scout groups, camping enthusiasts, uniformed professionals such as firefighters, police officers, EMTs, prestigious military units, and Fortune 500 companies.',
       'We take great pride in our work and the value we offer. We are privileged to have created patches for every United States Armed Forces branch.',
-      'When you choose Patches4Less.com, you can be assured that you are receiving the highest-quality patches at the most competitive prices. Your satisfaction is our top priority, as is our dedication to providing you with an exceptional patch-making experience.',
+      'When you choose Patch4Ever.com, you can be assured that you are receiving the highest-quality patches at the most competitive prices. Your satisfaction is our top priority, as is our dedication to providing you with an exceptional patch-making experience.',
     ],
   },
   {
@@ -257,7 +257,7 @@ export const WHY_CHOOSE_ROWS = [
     image: ASSETS.designProcess,
     alt: 'A design transformation image showing a sketch transitioning into a full-color patch.',
     paragraphs: [
-      'Creating a patch for your team, organization, or company should be an exciting adventure, not a stressful task. At Patches4Less.com, we\'ve streamlined the design process to ensure it\'s as easy and enjoyable as possible.',
+      'Creating a patch for your team, organization, or company should be an exciting adventure, not a stressful task. At Patch4Ever.com, we\'ve streamlined the design process to ensure it\'s as easy and enjoyable as possible.',
       'Our talented graphic artists are among the best in the industry, ready to turn your ideas into reality. Simply share a picture of your logo, an existing patch, or any concept you want transformed into a custom embroidered patch.',
       'We accept design images in almost any format, making it incredibly convenient for you. You can even email us a sketch or drawing of your envisioned design. Our goal is to adapt to your needs and bring your design ideas to life.',
     ],
@@ -267,10 +267,10 @@ export const WHY_CHOOSE_ROWS = [
     image: ASSETS.variety1,
     alt: 'A stack of embroidered patches with various designs, including one with the text GHOST and another with RAVEN.',
     paragraphs: [
-      'At Patches4Less.com, we understand that variety adds zest to life. That’s why we offer an extensive range of patch options to cater to your unique needs. Our aim is to provide you with a fully personalized product that perfectly captures your vision.',
+      'At Patch4Ever.com, we understand that variety adds zest to life. That’s why we offer an extensive range of patch options to cater to your unique needs. Our aim is to provide you with a fully personalized product that perfectly captures your vision.',
       'We offer a broad selection of sizes and custom shapes, ensuring your patches fit seamlessly wherever you plan to display them. But our customization options don’t end there. You can choose from a variety of border types to frame your design and a wide spectrum of thread colors to bring it to vibrant life.',
       'Additionally, we provide several attachment methods, allowing you to select the one that best suits your application needs.',
-      'Simply tell us what you envision, and our dedicated team of artists will bring it to life. With Patches4Less.com, creating your dream patch is straightforward and enjoyable. Let us show you how easy and fun the process of ordering custom patches can be!',
+      'Simply tell us what you envision, and our dedicated team of artists will bring it to life. With Patch4Ever.com, creating your dream patch is straightforward and enjoyable. Let us show you how easy and fun the process of ordering custom patches can be!',
     ],
   },
 ]
@@ -294,10 +294,10 @@ export const REVIEWS = [
   {
     quote: '“Super helpful and easy to work with! Love my patches, they turned out amazing!!!”',
     author: 'Manna',
-    url: 'https://www.trustpilot.com/review/www.patches4less.com?page=9',
+    url: 'https://www.trustpilot.com/review/www.patch4ever.com?page=9',
   },
   {
-    quote: '“Patches4Less is a great company to work with. They\'re quick to get back with their quotes and artwork.”',
+    quote: '“Patch4Ever is a great company to work with. They\'re quick to get back with their quotes and artwork.”',
     author: 'mom',
     url: 'https://www.trustpilot.com/reviews/64cc5354839e1a9a71d60884',
   },
