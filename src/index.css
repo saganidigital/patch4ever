@@ -299,12 +299,20 @@
 /* Hang Tag Card (Trusted Since 2003) */
 .hang-tag-card {
   position: relative;
-  transform: rotate(2.2deg);
   transition: transform 0.25s ease-out;
 }
-
-.hang-tag-card:hover {
-  transform: rotate(0.6deg);
+@media (min-width: 768px) {
+  .hang-tag-card {
+    transform: rotate(2.2deg);
+  }
+  .hang-tag-card:hover {
+    transform: rotate(0.6deg);
+  }
+}
+@media (max-width: 767px) {
+  .mobile-straight {
+    transform: none !important;
+  }
 }
 
 .hang-tag-card::before {

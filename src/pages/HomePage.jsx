@@ -56,23 +56,23 @@ export default function HomePage({ onOpenVideo }) {
         />
 
         <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:pt-10">
-          {/* 2-Column Hero Grid */}
-          <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12 lg:gap-6">
-            <div className="lg:col-span-6">
+          {/* 2-Column Hero Grid (Image first + centered copy + full-width CTAs on mobile) */}
+          <div className="grid grid-cols-1 items-center gap-7 lg:grid-cols-12 lg:gap-6">
+            <div className="order-2 text-center lg:order-1 lg:col-span-6 lg:text-left">
               <h1 className="m-0 font-heading text-[clamp(2.75rem,4.5vw,4.25rem)] leading-[0.94] font-bold tracking-[-0.01em] text-white drop-shadow-[0_2px_10px_rgb(0_0_0/0.35)]">
                 <span className="block">Custom patches.</span>
                 <span className="block">Big impact.</span>
                 <span className="hero-deadline-underline mt-1 text-accent">Even on a deadline.</span>
               </h1>
 
-              <p className="mt-7 max-w-lg text-lg leading-relaxed text-white/95 sm:text-xl">
+              <p className="mx-auto mt-7 max-w-lg text-lg leading-relaxed text-white/95 sm:text-xl lg:mx-0">
                 Bring your team, brand or next big event to life with custom patches made just for you.
               </p>
 
-              <div className="mt-7 flex flex-wrap items-center gap-3.5">
+              <div className="mt-7 flex flex-col items-stretch gap-3.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
                 <Link
                   to="/make-your-own-patches"
-                  className="hero-cta inline-flex min-h-14 items-center justify-center gap-2 rounded-md bg-accent px-6 font-heading text-xl font-bold text-white no-underline shadow-lg transition-colors hover:bg-accent-600"
+                  className="hero-cta inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 font-heading text-xl font-bold text-white no-underline shadow-lg transition-colors hover:bg-accent-600 sm:w-auto"
                 >
                   Create Your Patches
                   <ArrowRight className="hero-cta-arrow size-5" />
@@ -80,7 +80,7 @@ export default function HomePage({ onOpenVideo }) {
 
                 <Link
                   to="/rush-patches"
-                  className="hero-cta-rush inline-flex min-h-14 items-center justify-center gap-2.5 rounded-md bg-white px-6 font-heading text-xl font-bold text-primary-900 no-underline shadow-lg transition-colors hover:bg-primary-50"
+                  className="hero-cta-rush inline-flex min-h-14 w-full items-center justify-center gap-2.5 rounded-md bg-white px-6 font-heading text-xl font-bold text-primary-900 no-underline shadow-lg transition-colors hover:bg-primary-50 sm:w-auto"
                 >
                   <Zap className="hero-cta-bolt size-5 fill-accent text-accent" />
                   Need them fast?
@@ -88,7 +88,7 @@ export default function HomePage({ onOpenVideo }) {
               </div>
             </div>
 
-            <div className="lg:col-span-6">
+            <div className="order-1 lg:order-2 lg:col-span-6">
               <div className="drop-shadow-[0_22px_24px_rgba(0,0,0,0.45)]">
                 <img
                   src={ASSETS.miscPatchStyles}
@@ -102,7 +102,7 @@ export default function HomePage({ onOpenVideo }) {
                         }
                       : undefined
                   }
-                  className="patch-cutout-mask mx-auto h-auto w-full max-w-md lg:max-w-[40rem]"
+                  className="patch-cutout-mask mx-auto h-auto w-full max-w-[340px] sm:max-w-md lg:max-w-[40rem]"
                 />
               </div>
             </div>
@@ -113,22 +113,22 @@ export default function HomePage({ onOpenVideo }) {
             BUILD YOUR PERFECT PATCH
           </h2>
 
-          {/* 6 Stitched Patch Type Cards */}
-          <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-6">
+          {/* 6 Stitched Patch Type Cards (3x2 compact grid on mobile, 6-col on desktop) */}
+          <div className="mt-8 grid grid-cols-3 gap-x-4 gap-y-9 lg:grid-cols-6 lg:gap-6">
             {PATCH_TYPES.map((type) => (
               <Link key={type.id} to={type.href} className="patch-type-link group">
                 <div
-                  className="patch-type-patch mx-auto aspect-square w-full max-w-[186px]"
+                  className="patch-type-patch mx-auto aspect-square w-full max-w-[186px] !p-2 sm:!p-3"
                   style={{ transform: `rotate(${type.tilt})` }}
                 >
                   <img
                     src={type.image}
                     alt={`${type.name} patches`}
-                    className="size-full rounded-xl object-cover"
+                    className="size-full rounded-lg object-cover sm:rounded-xl"
                   />
-                  <span className="patch-type-tag">As low as {type.fromPrice}</span>
+                  <span className="patch-type-tag !px-2 !text-[11px] sm:!px-2.5 sm:!text-[13px]">As low as {type.fromPrice}</span>
                 </div>
-                <span className="mt-5 block font-heading text-2xl font-bold tracking-tight text-white">
+                <span className="mt-4 block font-heading text-lg font-bold tracking-tight text-white sm:mt-5 sm:text-2xl">
                   {type.name}
                 </span>
               </Link>
@@ -139,7 +139,7 @@ export default function HomePage({ onOpenVideo }) {
 
       {/* SECTION 2: Value Proposition Trust Strip */}
       <section className="relative z-10 bg-neutral-50 shadow-md dark:bg-neutral-800">
-        <ul className="mx-auto flex max-w-7xl flex-col items-center justify-center gap-x-8 gap-y-2 px-4 py-3 text-center font-heading text-base font-bold text-primary-600 sm:flex-row sm:flex-wrap sm:text-lg xl:gap-x-10 2xl:text-xl dark:text-white">
+        <ul className="mx-auto flex w-fit max-w-7xl flex-col items-start justify-center gap-x-8 gap-y-2.5 px-4 py-4 font-heading text-base font-bold text-primary-600 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:py-3 sm:text-lg xl:gap-x-10 2xl:text-xl dark:text-white">
           {VALUE_PROPS.map((label) => (
             <li key={label} className="flex items-center gap-2.5 whitespace-nowrap">
               <Star className="size-5 shrink-0 fill-accent-600 text-accent-600 dark:fill-accent-400 dark:text-accent-400" />
@@ -304,7 +304,7 @@ export default function HomePage({ onOpenVideo }) {
       <aside className="hats-promo">
         <div className="hats-promo-band">
           <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-12">
-            <div className="relative -mt-14 lg:col-span-6 lg:-my-12">
+            <div className="relative -mt-28 lg:col-span-6 lg:-my-12">
               <img
                 src={ASSETS.hatHero}
                 alt="Three caps with custom patches on the front: a teal and navy trucker with a round Helena Field School patch, a camo trucker with a Sentinel Rising Texas Hunt patch, and a khaki cap with a Dubois County Bombers patch."
@@ -429,7 +429,7 @@ export default function HomePage({ onOpenVideo }) {
           <div className="ordering-steps mt-14 grid grid-cols-1 gap-10 md:grid-cols-3">
             {PROCESS_STEPS.map((step) => (
               <div key={step.num} className="relative z-10 flex flex-col">
-                <div className="relative" style={{ transform: `rotate(${step.tilt})` }}>
+                <div className="mobile-straight relative" style={{ transform: `rotate(${step.tilt})` }}>
                   <span className="absolute -left-3 -top-4 z-20 grid size-11 place-items-center rounded-full bg-accent font-heading text-2xl font-black text-white shadow-md ring-4 ring-white dark:ring-neutral-900">
                     {step.num}
                   </span>
@@ -462,7 +462,7 @@ export default function HomePage({ onOpenVideo }) {
       {/* SECTION 7: 100% Quality Guarantee Full-Width Teal Banner */}
       <aside className="guarantee-banner-bg overflow-x-clip border-y-4 border-primary-800 py-12 text-white md:py-14">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-4 sm:px-6 md:grid-cols-12">
-          <div className="md:col-span-8">
+          <div className="text-center md:col-span-8 md:text-left">
             <h2 className="font-heading text-3xl leading-tight font-bold text-balance drop-shadow-md md:text-4xl">
               Every Custom Patch We Make is Backed by Our Outstanding Customer Service and{' '}
               <span className="text-accent">100% Quality Guarantee</span>
@@ -470,24 +470,24 @@ export default function HomePage({ onOpenVideo }) {
             <p className="mt-3 text-base text-primary-50">
               If you have questions, feel free to contact us via our contact form, email us, or call us toll-free.
             </p>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center md:justify-start">
               <a
                 href={CONTACT.phoneHref}
-                className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 font-heading text-lg font-semibold tracking-wide text-white no-underline shadow-md transition hover:bg-accent-600"
+                className="inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 font-heading text-lg font-semibold tracking-wide text-white no-underline shadow-md transition hover:bg-accent-600"
               >
-                <Phone className="size-4" />
+                <Phone className="hidden size-4 md:inline-block" />
                 {CONTACT.phone}
               </a>
               <a
                 href={`mailto:${CONTACT.email}`}
-                className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-5 py-2.5 font-heading text-lg font-semibold tracking-wide text-white no-underline transition hover:bg-white/20"
+                className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-6 py-2.5 font-heading text-lg font-semibold tracking-wide text-white no-underline transition hover:bg-white/20"
               >
-                <Mail className="size-4" />
+                <Mail className="hidden size-4 md:inline-block" />
                 {CONTACT.email}
               </a>
               <Link
                 to="/contact"
-                className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-5 py-2.5 font-heading text-lg font-semibold tracking-wide text-white no-underline transition hover:bg-white/20"
+                className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-6 py-2.5 font-heading text-lg font-semibold tracking-wide text-white no-underline transition hover:bg-white/20"
               >
                 Contact form
               </Link>
@@ -524,7 +524,7 @@ export default function HomePage({ onOpenVideo }) {
                     src={row.image}
                     alt={row.alt}
                     style={{ transform: `rotate(${isEven ? '3deg' : '-3deg'})` }}
-                    className="mx-auto w-64 rounded-2xl bg-white p-2 shadow-[0_2px_4px_rgba(0,0,0,0.08),0_20px_36px_-18px_rgba(0,0,0,0.45)] md:w-full max-w-[330px] dark:bg-neutral-800"
+                    className="mobile-straight mx-auto w-64 rounded-2xl bg-white p-2 shadow-[0_2px_4px_rgba(0,0,0,0.08),0_20px_36px_-18px_rgba(0,0,0,0.45)] md:w-full max-w-[330px] dark:bg-neutral-800"
                   />
                 </div>
                 <div className={`md:col-span-7 ${isEven ? 'md:order-1' : ''}`}>
@@ -545,7 +545,7 @@ export default function HomePage({ onOpenVideo }) {
 
       {/* SECTION 9: What Our Customers Say (Trustpilot Grid) */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20">
-        <div className="text-center">
+        <div className="text-left md:text-center">
           <h2 className="font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent">
             What Our Customers Say
           </h2>
@@ -756,18 +756,18 @@ export default function HomePage({ onOpenVideo }) {
       </section>
 
       {/* SECTION 12: HOW TO IRON ON A PATCH Video Banner */}
-      <aside className="relative isolate flex min-h-[320px] items-center overflow-clip bg-primary-950 text-white">
+      <aside className="relative isolate flex min-h-[380px] items-end overflow-clip bg-primary-950 text-white sm:min-h-[320px] sm:items-center">
         <img
           src={ASSETS.bumperIronOn}
           alt="An embroidered mountain patch on a denim jacket beside an iron, a pressing cloth, and spools of thread"
-          className="absolute inset-0 -z-20 size-full object-cover object-right"
+          className="absolute inset-0 -z-20 size-full object-cover object-center sm:object-right"
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-linear-to-r from-primary-950 via-primary-950/90 to-primary-950/20"
+          className="absolute inset-0 -z-10 bg-linear-to-t from-primary-950 via-primary-950/75 to-primary-950/15 sm:bg-linear-to-r sm:from-primary-950 sm:via-primary-950/90 sm:to-primary-950/20"
         />
-        <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
-          <h2 className="font-heading text-4xl font-black tracking-tight text-white uppercase sm:text-5xl">
+        <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-24 sm:px-6 sm:py-14">
+          <h2 className="font-heading text-[30px] leading-tight font-black tracking-tight text-white uppercase sm:text-5xl">
             HOW TO IRON ON A PATCH
           </h2>
           <p className="mt-2 max-w-lg text-base text-primary-100 sm:text-lg">
@@ -788,7 +788,7 @@ export default function HomePage({ onOpenVideo }) {
       {/* SECTION 13: The Latest Posts From Our Blog */}
       <aside className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 className="font-heading text-3xl font-bold text-primary-800 sm:text-4xl dark:text-white">
+          <h2 className="font-heading text-4xl font-bold text-primary-800 dark:text-white">
             The Latest Posts From Our Blog
           </h2>
           <Link

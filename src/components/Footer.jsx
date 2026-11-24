@@ -32,7 +32,7 @@ export default function Footer() {
               Thanks for subscribing! Watch your inbox for exclusive patch discounts.
             </div>
           ) : (
-            <form onSubmit={handleSubscribe} className="flex w-full max-w-md items-stretch overflow-hidden rounded-lg bg-white shadow-md">
+            <form onSubmit={handleSubscribe} className="flex h-[54px] w-full max-w-md items-stretch overflow-hidden rounded-lg bg-white shadow-md sm:h-12">
               <label htmlFor="newsletter-email" className="sr-only">
                 Email address
               </label>
@@ -43,11 +43,11 @@ export default function Footer() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="min-w-0 flex-1 bg-white px-4 py-2.5 text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none"
+                className="min-w-0 flex-1 bg-white px-4 text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none"
               />
               <button
                 type="submit"
-                className="inline-flex cursor-pointer items-center gap-2 bg-primary-600 px-5 py-2.5 font-heading text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-primary-700"
+                className="inline-flex cursor-pointer items-center gap-2 bg-primary-600 px-5 font-heading text-base font-bold uppercase tracking-wide text-white transition-colors hover:bg-primary-700"
               >
                 <Send className="size-4" />
                 SIGN UP
@@ -64,9 +64,9 @@ export default function Footer() {
       <footer ref={footerRef} className="site-footer relative w-full select-none bg-primary-800 text-white dark:bg-primary-950">
         <FooterPaw footerRef={footerRef} />
         <div className="mx-auto max-w-7xl px-6 pb-10 pt-12">
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-10 lg:grid-cols-12">
             {/* Brand & Contact */}
-            <div className="lg:col-span-4">
+            <div className="col-span-2 lg:col-span-4">
               <Link to="/" aria-label="Homepage" className="inline-block">
                 <Logo className="h-9 w-auto text-white" />
               </Link>
@@ -105,7 +105,7 @@ export default function Footer() {
             </div>
 
             {/* ADDITIONAL LINKS */}
-            <nav aria-label="Additional Links" className="lg:col-span-3">
+            <nav aria-label="Additional Links" className="col-span-1 lg:col-span-3">
               <h3 className="mb-3 font-heading text-sm font-bold uppercase tracking-wider text-white">
                 ADDITIONAL LINKS
               </h3>
@@ -124,7 +124,7 @@ export default function Footer() {
             </nav>
 
             {/* ABOUT */}
-            <nav aria-label="About" className="lg:col-span-2">
+            <nav aria-label="About" className="col-span-1 lg:col-span-2">
               <h3 className="mb-3 font-heading text-sm font-bold uppercase tracking-wider text-white">
                 ABOUT
               </h3>
@@ -143,7 +143,7 @@ export default function Footer() {
             </nav>
 
             {/* HELP */}
-            <nav aria-label="Help" className="lg:col-span-2">
+            <nav aria-label="Help" className="col-span-2 lg:col-span-2">
               <h3 className="mb-3 font-heading text-sm font-bold uppercase tracking-wider text-white">
                 HELP
               </h3>
@@ -173,7 +173,7 @@ export default function Footer() {
             </nav>
 
             {/* Social Icons */}
-            <div className="flex items-start gap-3 lg:col-span-1 lg:justify-end">
+            <div className="col-span-2 flex items-start gap-3 lg:col-span-1 lg:justify-end">
               <a
                 href="https://www.facebook.com/Patch4Ever"
                 target="_blank"
@@ -226,7 +226,7 @@ export default function Footer() {
           {/* Divider + Copyright + BBB + Legal */}
           <div className="mt-10 border-t border-white/15 pt-8">
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-              <div className="flex flex-wrap items-center gap-5">
+              <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-start sm:gap-5">
                 <p className="text-xs text-primary-100">
                   Copyright © 2003 - 2026 &nbsp;{' '}
                   <a
@@ -244,12 +244,12 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   title="TJM Promos, Inc., Wearable Promotional Products, Ocala, FL"
-                  className="inline-block rounded bg-white/95 p-0.5 shadow"
+                  className="inline-block shrink-0 rounded bg-white/95 p-0.5 shadow"
                 >
                   <img
                     src={ASSETS.bbbSeal}
                     alt="TJM Promos, Inc., Promotional Products, Ocala, FL"
-                    className="h-11 w-auto"
+                    className="h-10 w-auto sm:h-11"
                   />
                 </a>
               </div>

@@ -24,8 +24,9 @@ export default function Header({ darkMode, onToggleDark, cartCount, onOpenCart }
   const [activeMenu, setActiveMenu] = useState(null)
   const [scrolled, setScrolled] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [mobileAccordion, setMobileAccordion] = useState('PRODUCTS')
+  const [mobileAccordion, setMobileAccordion] = useState('')
   const closeTimerRef = useRef(null)
+  const lastScrollYRef = useRef(0)
 
   useEffect(() => {
     setActiveMenu(null)
@@ -33,7 +34,25 @@ export default function Header({ darkMode, onToggleDark, cartCount, onOpenCart }
   }, [pathname])
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 520)
+    const onScroll = () => {
+      const y = window.scrollY
+      const isDesktop = window.innerWidth >= 1024
+      if (isDesktop) {
+        setScrolled(y > 520)
+      } else {
+        // Mobile peek bar appears when scrolling UP past the hero
+        const scrollingUp = y < lastScrollYRef.current - 4
+        const scrollingDown = y > lastScrollYRef.current + 4
+        if (y <= 360) {
+          setScrolled(false)
+        } else if (scrollingUp) {
+          setScrolled(true)
+        } else if (scrollingDown) {
+          setScrolled(false)
+        }
+      }
+      lastScrollYRef.current = y
+    }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -105,15 +124,17 @@ export default function Header({ darkMode, onToggleDark, cartCount, onOpenCart }
                 )}
               </button>
 
-              <button
-                type="button"
-                onClick={onToggleDark}
-                title={darkMode ? 'Turn on light mode' : 'Turn on dark mode'}
-                aria-label={darkMode ? 'Turn on light mode' : 'Turn on dark mode'}
-                className="inline-flex size-10 cursor-pointer items-center justify-center rounded-md bg-neutral-100 text-primary-700 transition-colors hover:bg-neutral-200 dark:bg-white/10 dark:text-white dark:hover:bg-white/20"
-              >
-                {darkMode ? <Moon className="size-5" /> : <Sun className="size-5" />}
-              </button>
+              <div className="ml-1 border-l border-neutral-200 pl-1.5 dark:border-white/15">
+                <button
+                  type="button"
+                  onClick={onToggleDark}
+                  title={darkMode ? 'Turn on light mode' : 'Turn on dark mode'}
+                  aria-label={darkMode ? 'Turn on light mode' : 'Turn on dark mode'}
+                  className="inline-flex size-10 cursor-pointer items-center justify-center rounded-md text-primary-700 transition-colors hover:bg-neutral-100 sm:bg-neutral-100 sm:hover:bg-neutral-200 dark:text-white dark:hover:bg-white/15 sm:dark:bg-white/10"
+                >
+                  {darkMode ? <Moon className="size-5" /> : <Sun className="size-5" />}
+                </button>
+              </div>
             </nav>
           </div>
         </section>
@@ -357,142 +378,219 @@ export default function Header({ darkMode, onToggleDark, cartCount, onOpenCart }
         </Link>
       </header>
 
-      {/* Sticky Scroll Header */}
+      {/* Sticky Scroll Header / Mobile Peek Bar */}
       <div
         className={`fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-primary-900/95 shadow-lg shadow-primary-950/30 backdrop-blur-md transition-all duration-200 dark:bg-primary-950/95 ${
           scrolled ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-full opacity-0'
         }`}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
-          <Link to="/" className="flex items-center" aria-label="Patch4Ever home">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6">
+          <Link to="/" className="hidden items-center md:flex" aria-label="Patch4Ever home">
             <Logo className="h-8 w-auto text-white" />
           </Link>
 
-          <div className="flex items-center gap-2.5">
-            <div className="hidden md:block">
-              <SplitPillCTA size="sm" />
+          <div className="flex w-full items-center justify-between gap-2 md:w-auto md:justify-end md:gap-2.5">
+            <SplitPillCTA size="sm" />
+            <div className="flex items-center gap-1 sm:gap-2">
+              <button
+                type="button"
+                onClick={onOpenCart}
+                title="View cart"
+                className="relative inline-flex size-10 cursor-pointer items-center justify-center rounded-md text-white transition-colors hover:bg-white/10"
+              >
+                <ShoppingCart className="size-5" />
+                {cartCount > 0 && (
+                  <span className="absolute right-0.5 top-0.5 grid min-w-4.5 place-items-center rounded-full bg-accent px-1 text-[11px] font-black leading-4 text-white">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setDrawerOpen(true)}
+                aria-label="Open menu"
+                className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-md px-2 font-heading text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white/15 md:border-2 md:border-white/35 md:bg-white/5 md:px-3"
+              >
+                <Menu className="size-6 md:size-4" />
+                <span className="hidden md:inline">MENU</span>
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={onOpenCart}
-              title="View cart"
-              className="relative inline-flex size-10 cursor-pointer items-center justify-center rounded-md text-white transition-colors hover:bg-white/10"
-            >
-              <ShoppingCart className="size-5" />
-              {cartCount > 0 && (
-                <span className="absolute right-0.5 top-0.5 grid min-w-4.5 place-items-center rounded-full bg-accent px-1 text-[11px] font-black leading-4 text-white">
-                  {cartCount}
-                </span>
-              )}
-            </button>
-            <button
-              type="button"
-              onClick={() => setDrawerOpen(true)}
-              className="inline-flex h-10 cursor-pointer items-center gap-2 rounded-md border-2 border-white/35 bg-white/5 px-3 font-heading text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-white/15"
-            >
-              <Menu className="size-4" />
-              MENU
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Slide-out Menu Drawer */}
+      {/* Slide-out Menu Drawer (Matches Live White Mobile Drawer) */}
       {drawerOpen && (
         <div className="fixed inset-0 z-50 flex justify-end" role="dialog" aria-modal="true" aria-label="Navigation menu">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-xs" onClick={() => setDrawerOpen(false)} />
-          <div className="relative z-10 flex h-full w-full max-w-sm flex-col overflow-y-auto bg-primary-900 p-6 text-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/15 pb-4">
-              <Logo className="h-8 w-auto text-white" />
-              <button
-                type="button"
-                onClick={() => setDrawerOpen(false)}
-                className="inline-flex size-9 items-center justify-center rounded-md text-white/80 hover:bg-white/10"
-                aria-label="Close navigation menu"
-              >
-                <X className="size-5" />
-              </button>
-            </div>
-
-            <div className="my-5 flex justify-center">
-              <SplitPillCTA size="sm" />
-            </div>
-
-            <nav className="space-y-2">
-              <div>
+          <div className="relative z-10 flex h-full w-[calc(100%-2rem)] max-w-md flex-col bg-white text-neutral-900 shadow-2xl dark:bg-primary-950 dark:text-white">
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-3.5 dark:border-white/10">
+              <Link to="/" onClick={() => setDrawerOpen(false)} aria-label="Patch4Ever home">
+                <Logo className="h-8 w-auto text-primary-800 dark:text-white" />
+              </Link>
+              <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => setMobileAccordion(mobileAccordion === 'PRODUCTS' ? '' : 'PRODUCTS')}
-                  className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 font-heading text-lg font-bold uppercase hover:bg-white/10"
+                  onClick={() => {
+                    setDrawerOpen(false)
+                    onOpenCart()
+                  }}
+                  title="View cart"
+                  className="relative inline-flex size-10 cursor-pointer items-center justify-center rounded-md text-neutral-600 hover:bg-neutral-100 dark:text-white dark:hover:bg-white/10"
                 >
-                  PRODUCTS <ChevronDown className={`size-4 transition ${mobileAccordion === 'PRODUCTS' ? 'rotate-180' : ''}`} />
+                  <ShoppingCart className="size-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute right-0.5 top-0.5 grid min-w-4.5 place-items-center rounded-full bg-accent px-1 text-[11px] font-black leading-4 text-white">
+                      {cartCount}
+                    </span>
+                  )}
                 </button>
-                {mobileAccordion === 'PRODUCTS' && (
-                  <div className="mt-1 space-y-1 pl-3">
-                    {PATCH_TYPES.map((t) => (
-                      <Link
-                        key={t.id}
-                        to={t.href}
-                        className="flex items-center justify-between rounded-md px-3 py-2 text-sm text-primary-100 no-underline hover:bg-white/10"
-                      >
-                        <span>{t.fullName}</span>
-                        <span className="text-xs font-bold text-accent-300">from {t.fromPrice}</span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div>
                 <button
                   type="button"
-                  onClick={() => setMobileAccordion(mobileAccordion === 'STYLES' ? '' : 'STYLES')}
-                  className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 font-heading text-lg font-bold uppercase hover:bg-white/10"
+                  onClick={() => setDrawerOpen(false)}
+                  className="inline-flex size-10 cursor-pointer items-center justify-center rounded-md text-neutral-600 hover:bg-neutral-100 dark:text-white dark:hover:bg-white/10"
+                  aria-label="Close navigation menu"
                 >
-                  STYLES <ChevronDown className={`size-4 transition ${mobileAccordion === 'STYLES' ? 'rotate-180' : ''}`} />
+                  <X className="size-6" />
                 </button>
-                {mobileAccordion === 'STYLES' && (
-                  <div className="mt-1 grid grid-cols-2 gap-1 pl-3">
-                    {STYLE_CATEGORIES.flatMap((c) => c.items).map((item) => (
-                      <Link
-                        key={item.href}
-                        to={item.href}
-                        className="rounded-md px-2 py-1.5 text-xs text-primary-100 no-underline hover:bg-white/10"
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
               </div>
+            </div>
 
-              <Link to="/options" className="block rounded-lg px-3 py-2.5 font-heading text-lg font-bold uppercase text-white no-underline hover:bg-white/10">
-                OPTIONS
-              </Link>
-              <Link to="/rush-patches" className="flex items-center gap-2 rounded-lg px-3 py-2.5 font-heading text-lg font-bold uppercase text-white no-underline hover:bg-white/10">
-                <Zap className="size-4 fill-accent text-accent" /> RUSH PATCHES
-              </Link>
-              <Link to="/pricing" className="block rounded-lg px-3 py-2.5 font-heading text-lg font-bold uppercase text-white no-underline hover:bg-white/10">
-                PRICING
-              </Link>
+            {/* Scrollable Body */}
+            <div className="flex-1 overflow-y-auto px-5 py-5">
+              <p className="font-heading text-lg font-bold tracking-wide text-primary-800 uppercase dark:text-primary-200">
+                PATCH TYPES
+              </p>
 
-              <div className="border-t border-white/15 pt-2">
-                {EXPLORE_LINKS.map((item) => (
+              {/* 2x3 Visual Patch Type Cards */}
+              <div className="mt-3 grid grid-cols-2 gap-3">
+                {PATCH_TYPES.map((t) => (
                   <Link
-                    key={item.href}
-                    to={item.href}
-                    className="block rounded-lg px-3 py-2 text-sm text-primary-100 no-underline hover:bg-white/10"
+                    key={t.id}
+                    to={t.href}
+                    className="relative flex flex-col items-center rounded-2xl bg-neutral-50 px-3 pb-3 pt-2.5 text-center no-underline ring-1 ring-neutral-200/80 transition hover:bg-primary-50 dark:bg-white/5 dark:ring-white/10"
                   >
-                    {item.name}
+                    {t.badge && (
+                      <span
+                        className={`absolute -top-2.5 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full px-2.5 py-0.5 font-heading text-[10px] font-bold tracking-wider text-white uppercase shadow ${
+                          t.badgeTone === 'accent' ? 'bg-accent' : 'bg-primary-600'
+                        }`}
+                      >
+                        {t.badge}
+                      </span>
+                    )}
+                    <img
+                      src={t.image}
+                      alt={t.fullName}
+                      className="aspect-[16/10] w-full rounded-xl object-cover"
+                    />
+                    <span className="mt-2 font-heading text-base font-bold text-accent-700 uppercase dark:text-accent-400">
+                      {t.name}
+                    </span>
+                    <span className="text-xs text-neutral-600 dark:text-neutral-300">
+                      from <strong className="font-bold text-neutral-900 dark:text-white">{t.fromPrice}</strong>
+                    </span>
                   </Link>
                 ))}
               </div>
-            </nav>
 
-            <div className="mt-auto space-y-2 border-t border-white/15 pt-4 text-xs text-primary-100">
-              <p>{CONTACT.phone}</p>
-              <p>{CONTACT.email}</p>
-              <p>{CONTACT.hours}</p>
+              <p className="mt-3 text-xs text-neutral-500 dark:text-neutral-400">
+                Starting prices are per patch at the highest quantity tier.
+              </p>
+
+              {/* Bordered Action Buttons */}
+              <div className="mt-4 space-y-2.5">
+                <Link
+                  to="/rush-patches"
+                  className="flex w-full items-center gap-2.5 rounded-xl border border-accent-300 bg-white px-4 py-3 font-heading text-lg font-bold text-primary-800 no-underline transition hover:bg-accent/5 dark:border-accent-500/50 dark:bg-white/5 dark:text-white"
+                >
+                  <Zap className="size-4 fill-accent text-accent" />
+                  Rush Patches
+                </Link>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <Link
+                    to="/pricing"
+                    className="flex items-center justify-center rounded-xl border border-primary-200 bg-white py-2.5 font-heading text-lg font-bold text-primary-800 no-underline transition hover:bg-primary-50 dark:border-primary-800 dark:bg-white/5 dark:text-white"
+                  >
+                    Pricing
+                  </Link>
+                  <Link
+                    to="/options"
+                    className="flex items-center justify-center rounded-xl border border-primary-200 bg-white py-2.5 font-heading text-lg font-bold text-primary-800 no-underline transition hover:bg-primary-50 dark:border-primary-800 dark:bg-white/5 dark:text-white"
+                  >
+                    Options
+                  </Link>
+                </div>
+              </div>
+
+              {/* Accordions: PATCH STYLES & EXPLORE */}
+              <div className="mt-5 divide-y divide-neutral-200 border-t border-neutral-200 dark:divide-white/10 dark:border-white/10">
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setMobileAccordion(mobileAccordion === 'STYLES' ? '' : 'STYLES')}
+                    className="flex w-full cursor-pointer items-center justify-between py-3.5 font-heading text-lg font-bold text-primary-800 uppercase dark:text-white"
+                  >
+                    PATCH STYLES
+                    <ChevronDown className={`size-5 transition-transform ${mobileAccordion === 'STYLES' ? 'rotate-180' : ''}`} />
+                  </button>
+                  {mobileAccordion === 'STYLES' && (
+                    <div className="grid grid-cols-2 gap-1 pb-3">
+                      {STYLE_CATEGORIES.flatMap((c) => c.items).map((item) => (
+                        <Link
+                          key={item.href}
+                          to={item.href}
+                          className="rounded-lg px-2 py-1.5 text-sm font-medium text-neutral-700 no-underline hover:bg-primary-50 dark:text-primary-100 dark:hover:bg-white/10"
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setMobileAccordion(mobileAccordion === 'EXPLORE' ? '' : 'EXPLORE')}
+                    className="flex w-full cursor-pointer items-center justify-between py-3.5 font-heading text-lg font-bold text-primary-800 uppercase dark:text-white"
+                  >
+                    EXPLORE
+                    <ChevronDown className={`size-5 transition-transform ${mobileAccordion === 'EXPLORE' ? 'rotate-180' : ''}`} />
+                  </button>
+                  {mobileAccordion === 'EXPLORE' && (
+                    <div className="space-y-1 pb-3">
+                      {EXPLORE_LINKS.map((item) => (
+                        <Link
+                          key={item.href}
+                          to={item.href}
+                          className="block rounded-lg px-2 py-1.5 text-sm font-medium text-neutral-700 no-underline hover:bg-primary-50 dark:text-primary-100 dark:hover:bg-white/10"
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Pinned Bottom CTA Bar */}
+            <div className="border-t border-neutral-200 bg-white px-5 pb-4 pt-3.5 shadow-[0_-8px_20px_-10px_rgba(0,0,0,0.12)] dark:border-white/10 dark:bg-primary-950">
+              <div className="flex justify-center">
+                <SplitPillCTA size="sm" />
+              </div>
+              <div className="mt-3 flex items-center justify-between text-xs text-neutral-600 dark:text-primary-200">
+                <span>Free proof · Free shipping</span>
+                <a
+                  href={CONTACT.phoneHref}
+                  className="inline-flex items-center gap-1.5 font-bold text-primary-700 no-underline dark:text-white"
+                >
+                  <Phone className="size-3.5" />
+                  {CONTACT.phone}
+                </a>
+              </div>
             </div>
           </div>
         </div>
