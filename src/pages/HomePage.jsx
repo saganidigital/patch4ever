@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import SplitPillCTA from '../components/SplitPillCTA'
 import StyleIcon from '../components/StyleIcon'
+import { MaskedText, RevealBlock } from '../components/TextReveal'
 import { ASSETS } from '../data/assets'
 import {
   ALL_PATCH_STYLES_ALPHA,
@@ -60,16 +61,29 @@ export default function HomePage({ onOpenVideo }) {
           <div className="grid grid-cols-1 items-center gap-7 lg:grid-cols-12 lg:gap-6">
             <div className="order-2 text-center lg:order-1 lg:col-span-6 lg:text-left">
               <h1 className="m-0 font-heading text-[clamp(2.75rem,4.5vw,4.25rem)] leading-[0.94] font-bold tracking-[-0.01em] text-white drop-shadow-[0_2px_10px_rgb(0_0_0/0.35)]">
-                <span className="block">Custom patches.</span>
-                <span className="block">Big impact.</span>
-                <span className="hero-deadline-underline mt-1 text-accent">Even on a deadline.</span>
+                <MaskedText as="span" text="Custom patches." delay={40} wordStep={55} immediate className="block" />
+                <MaskedText as="span" text="Big impact." delay={140} wordStep={55} immediate className="block" />
+                <RevealBlock as="span" variant="fade-up" delay={240} immediate className="hero-deadline-underline mt-1 text-accent">
+                  Even on a deadline.
+                </RevealBlock>
               </h1>
 
-              <p className="mx-auto mt-7 max-w-lg text-lg leading-relaxed text-white/95 sm:text-xl lg:mx-0">
+              <RevealBlock
+                as="p"
+                variant="blur-up"
+                delay={320}
+                immediate
+                className="mx-auto mt-7 max-w-lg text-lg leading-relaxed text-white/95 sm:text-xl lg:mx-0"
+              >
                 Bring your team, brand or next big event to life with custom patches made just for you.
-              </p>
+              </RevealBlock>
 
-              <div className="mt-7 flex flex-col items-stretch gap-3.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start">
+              <RevealBlock
+                variant="scale-up"
+                delay={400}
+                immediate
+                className="mt-7 flex flex-col items-stretch gap-3.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start"
+              >
                 <Link
                   to="/make-your-own-patches"
                   className="hero-cta inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-md bg-accent px-6 font-heading text-xl font-bold text-white no-underline shadow-lg transition-colors hover:bg-accent-600 sm:w-auto"
@@ -85,7 +99,7 @@ export default function HomePage({ onOpenVideo }) {
                   <Zap className="hero-cta-bolt size-5 fill-accent text-accent" />
                   Need them fast?
                 </Link>
-              </div>
+              </RevealBlock>
             </div>
 
             <div className="order-1 lg:order-2 lg:col-span-6">
@@ -168,46 +182,62 @@ export default function HomePage({ onOpenVideo }) {
         </div>
 
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
-          {/* Left Column */}
+          {/* Left Column — Editorial Masked Rise + Stitched Accent Showcase */}
           <div className="lg:col-span-6">
-            <h2 className="m-0 font-heading text-5xl leading-none font-black text-primary-700 md:text-6xl dark:text-primary-300">
-              Welcome to Patch4Ever!
-            </h2>
-            <p className="mt-2 font-heading text-3xl font-bold text-primary-600 dark:text-primary-400">
-              Custom patches since 2003
-            </p>
+            <MaskedText
+              as="h2"
+              text="Welcome to Patch4Ever!"
+              delay={0}
+              wordStep={55}
+              className="m-0 font-heading text-5xl leading-none font-black text-primary-700 md:text-6xl dark:text-primary-300"
+            />
+            <MaskedText
+              as="p"
+              text="Custom patches since 2003"
+              delay={180}
+              wordStep={45}
+              className="mt-2 font-heading text-3xl font-bold text-primary-600 dark:text-primary-400"
+            />
 
             <div className="mt-6 space-y-4 text-base leading-relaxed text-neutral-700 dark:text-neutral-200">
-              <p>
+              <RevealBlock as="p" variant="blur-up" delay={260}>
                 We make custom patches for sports teams, businesses, fire and police departments, military units, scout troops, motorcycle clubs and events. Choose from{' '}
-                <Link to="/embroidered-patches" className="font-semibold text-primary-700 underline decoration-primary-300 underline-offset-4 hover:text-primary-600 dark:text-primary-300">
+                <Link to="/embroidered-patches" className="stitched-inline-link font-semibold text-primary-700 hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-200">
                   custom embroidered patches
                 </Link>
                 ,{' '}
-                <Link to="/iron-on-patches" className="font-semibold text-primary-700 underline decoration-primary-300 underline-offset-4 hover:text-primary-600 dark:text-primary-300">
+                <Link to="/iron-on-patches" className="stitched-inline-link font-semibold text-primary-700 hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-200">
                   iron-on patches
                 </Link>
                 , woven, PVC, printed and leather. Put them where you need them, from{' '}
-                <Link to="/jacket-patches" className="font-semibold text-primary-700 underline decoration-primary-300 underline-offset-4 hover:text-primary-600 dark:text-primary-300">
+                <Link to="/jacket-patches" className="stitched-inline-link font-semibold text-primary-700 hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-200">
                   custom jacket patches
                 </Link>{' '}
                 to{' '}
-                <Link to="/velcro-patches" className="font-semibold text-primary-700 underline decoration-primary-300 underline-offset-4 hover:text-primary-600 dark:text-primary-300">
+                <Link to="/velcro-patches" className="stitched-inline-link font-semibold text-primary-700 hover:text-primary-600 dark:text-primary-300 dark:hover:text-primary-200">
                   custom velcro patches
                 </Link>{' '}
                 you can move between uniforms and gear.
-              </p>
-              <p>
+              </RevealBlock>
+              <RevealBlock as="p" variant="blur-up" delay={360}>
                 Every order starts with a free proof, and you can ask for changes until it looks right. You pay only after you approve it. Embroidered orders start at 10 patches, and shipping is free in the continental US.
-              </p>
+              </RevealBlock>
             </div>
 
-            <div className="mt-7 border-t border-dashed border-primary-200 pt-6 dark:border-primary-800">
+            <RevealBlock
+              as="div"
+              variant="stitch-line"
+              delay={440}
+              aria-hidden="true"
+              className="mt-7 border-t border-dashed border-primary-200 dark:border-primary-800"
+            />
+
+            <RevealBlock variant="scale-up" delay={500} className="pt-6">
               <p className="mb-4 font-heading text-xl font-bold text-primary-800 dark:text-white">
                 Send us your design and get a free proof.
               </p>
               <SplitPillCTA />
-            </div>
+            </RevealBlock>
           </div>
 
           {/* Right Column */}
@@ -321,18 +351,24 @@ export default function HomePage({ onOpenVideo }) {
             </div>
 
             <div className="text-center lg:col-span-6 lg:text-left">
-              <h2 className="font-heading text-5xl leading-[0.95] font-black text-balance text-white uppercase md:text-6xl">
-                YOUR PATCH. YOUR HATS. ONE ORDER.
-              </h2>
-              <p className="mx-auto mt-5 max-w-lg text-lg leading-relaxed text-primary-50 lg:mx-0">
+              <MaskedText
+                as="h2"
+                text="YOUR PATCH. YOUR HATS. ONE ORDER."
+                delay={0}
+                wordStep={48}
+                className="font-heading text-5xl leading-[0.95] font-black text-balance text-white uppercase md:text-6xl"
+              />
+              <RevealBlock as="p" variant="blur-up" delay={200} className="mx-auto mt-5 max-w-lg text-lg leading-relaxed text-primary-50 lg:mx-0">
                 Add caps and trucker hats to the same cart as your patches. Pick a style, a color and how many you need, and check out once.
-              </p>
-              <Link
-                to="/hat-patches#patched-hats-heading"
-                className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-white/30 bg-accent px-8 py-2.5 font-heading text-xl font-bold text-white uppercase no-underline shadow-lg transition hover:bg-accent-600"
-              >
-                SHOP HATS →
-              </Link>
+              </RevealBlock>
+              <RevealBlock variant="scale-up" delay={300}>
+                <Link
+                  to="/hat-patches#patched-hats-heading"
+                  className="mt-8 inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-white/30 bg-accent px-8 py-2.5 font-heading text-xl font-bold text-white uppercase no-underline shadow-lg transition hover:bg-accent-600"
+                >
+                  SHOP HATS →
+                </Link>
+              </RevealBlock>
             </div>
           </div>
         </div>
@@ -341,19 +377,23 @@ export default function HomePage({ onOpenVideo }) {
       {/* SECTION 5: We Make Custom Patches for Every Purpose + FIND YOUR PATCH STYLE */}
       <section className="mx-auto max-w-7xl px-4 pb-12 pt-16 sm:px-6">
         <div className="mx-auto max-w-4xl text-center">
-          <h2 className="m-0 font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent">
-            We Make Custom Patches for Every Purpose
-          </h2>
-          <p className="mt-4 text-base leading-relaxed text-neutral-700 sm:text-lg dark:text-neutral-300">
+          <MaskedText
+            as="h2"
+            text="We Make Custom Patches for Every Purpose"
+            delay={0}
+            wordStep={40}
+            className="m-0 font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent"
+          />
+          <RevealBlock as="p" variant="blur-up" delay={180} className="mt-4 text-base leading-relaxed text-neutral-700 sm:text-lg dark:text-neutral-300">
             Custom patches are incredibly versatile, perfect for enhancing team identity, boosting business branding, decorating uniforms, commemorating events, or encouraging unity in military units, motorcycle clubs, and more. At Patch4Ever.com, we specialize in creating personalized patches for every need. From design to delivery, we make it easy to bring your vision to life.
-          </p>
+          </RevealBlock>
         </div>
 
         <div className="mt-12 grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
           {/* Left 4 Purpose Feature Blocks */}
           <div className="space-y-8 lg:col-span-6">
-            {PURPOSES.map((item) => (
-              <div key={item.title} className="flex items-start gap-5">
+            {PURPOSES.map((item, idx) => (
+              <RevealBlock key={item.title} variant="fade-up" delay={idx * 80} className="flex items-start gap-5">
                 <img
                   src={item.image}
                   alt=""
@@ -367,7 +407,7 @@ export default function HomePage({ onOpenVideo }) {
                     {item.body}
                   </p>
                 </div>
-              </div>
+              </RevealBlock>
             ))}
           </div>
 
@@ -418,17 +458,21 @@ export default function HomePage({ onOpenVideo }) {
       <section className="bg-white py-20 shadow-sm md:py-24 dark:bg-neutral-800/50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="mx-auto max-w-3xl text-center">
-            <h2 className="m-0 font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent">
-              Ordering Custom Patches is as easy as 1-2-3!
-            </h2>
-            <p className="mt-4 text-base leading-relaxed text-neutral-700 sm:text-lg dark:text-neutral-300">
+            <MaskedText
+              as="h2"
+              text="Ordering Custom Patches is as easy as 1-2-3!"
+              delay={0}
+              wordStep={40}
+              className="m-0 font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent"
+            />
+            <RevealBlock as="p" variant="blur-up" delay={180} className="mt-4 text-base leading-relaxed text-neutral-700 sm:text-lg dark:text-neutral-300">
               At Patch4Ever.com, we pride ourselves on making the process of ordering custom patches as simple and straightforward as possible. In just three easy steps, you&apos;ll be on your way to receiving your own unique, high-quality patches.
-            </p>
+            </RevealBlock>
           </div>
 
           <div className="ordering-steps mt-14 grid grid-cols-1 gap-10 md:grid-cols-3">
-            {PROCESS_STEPS.map((step) => (
-              <div key={step.num} className="relative z-10 flex flex-col">
+            {PROCESS_STEPS.map((step, idx) => (
+              <RevealBlock key={step.num} variant="fade-up" delay={idx * 100} className="relative z-10 flex flex-col">
                 <div className="mobile-straight relative" style={{ transform: `rotate(${step.tilt})` }}>
                   <span className="absolute -left-3 -top-4 z-20 grid size-11 place-items-center rounded-full bg-accent font-heading text-2xl font-black text-white shadow-md ring-4 ring-white dark:ring-neutral-900">
                     {step.num}
@@ -446,7 +490,7 @@ export default function HomePage({ onOpenVideo }) {
                 <p className="mt-2.5 text-base leading-relaxed text-neutral-700 dark:text-neutral-300">
                   {step.body}
                 </p>
-              </div>
+              </RevealBlock>
             ))}
           </div>
 
@@ -462,7 +506,7 @@ export default function HomePage({ onOpenVideo }) {
       {/* SECTION 7: 100% Quality Guarantee Full-Width Teal Banner */}
       <aside className="guarantee-banner-bg overflow-x-clip border-y-4 border-primary-800 py-12 text-white md:py-14">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-4 sm:px-6 md:grid-cols-12">
-          <div className="text-center md:col-span-8 md:text-left">
+          <RevealBlock variant="blur-up" delay={40} className="text-center md:col-span-8 md:text-left">
             <h2 className="font-heading text-3xl leading-tight font-bold text-balance drop-shadow-md md:text-4xl">
               Every Custom Patch We Make is Backed by Our Outstanding Customer Service and{' '}
               <span className="text-accent">100% Quality Guarantee</span>
@@ -492,7 +536,7 @@ export default function HomePage({ onOpenVideo }) {
                 Contact form
               </Link>
             </div>
-          </div>
+          </RevealBlock>
 
           <div className="md:col-span-4">
             <img
@@ -507,9 +551,13 @@ export default function HomePage({ onOpenVideo }) {
 
       {/* SECTION 8: Why Choose Patch4Ever.com? */}
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <h2 className="m-0 text-center font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent">
-          Why Choose Patch4Ever.com?
-        </h2>
+        <MaskedText
+          as="h2"
+          text="Why Choose Patch4Ever.com?"
+          delay={0}
+          wordStep={50}
+          className="m-0 text-center font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent"
+        />
 
         <div className="mt-12 space-y-16">
           {WHY_CHOOSE_ROWS.map((row, idx) => {
@@ -527,7 +575,7 @@ export default function HomePage({ onOpenVideo }) {
                     className="mobile-straight mx-auto w-64 rounded-2xl bg-white p-2 shadow-[0_2px_4px_rgba(0,0,0,0.08),0_20px_36px_-18px_rgba(0,0,0,0.45)] md:w-full max-w-[330px] dark:bg-neutral-800"
                   />
                 </div>
-                <div className={`md:col-span-7 ${isEven ? 'md:order-1' : ''}`}>
+                <RevealBlock variant="blur-up" delay={100} className={`md:col-span-7 ${isEven ? 'md:order-1' : ''}`}>
                   <h3 className="font-heading text-3xl leading-tight font-bold text-primary-700 dark:text-primary-300">
                     {row.title}
                   </h3>
@@ -536,7 +584,7 @@ export default function HomePage({ onOpenVideo }) {
                       <p key={i}>{p}</p>
                     ))}
                   </div>
-                </div>
+                </RevealBlock>
               </div>
             )
           })}
@@ -546,18 +594,25 @@ export default function HomePage({ onOpenVideo }) {
       {/* SECTION 9: What Our Customers Say (Trustpilot Grid) */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-20">
         <div className="text-left md:text-center">
-          <h2 className="font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent">
-            What Our Customers Say
-          </h2>
-          <p className="mt-2 text-base text-neutral-600 dark:text-neutral-300">
+          <MaskedText
+            as="h2"
+            text="What Our Customers Say"
+            delay={0}
+            wordStep={50}
+            className="font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent"
+          />
+          <RevealBlock as="p" variant="fade-up" delay={160} className="mt-2 text-base text-neutral-600 dark:text-neutral-300">
             Don&apos;t just take our word for it.
-          </p>
+          </RevealBlock>
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {REVIEWS.map((review) => (
-            <article
+          {REVIEWS.map((review, idx) => (
+            <RevealBlock
               key={review.author}
+              as="article"
+              variant="fade-up"
+              delay={(idx % 3) * 80}
               className="stitched-card flex flex-col justify-between rounded-2xl bg-white p-7 shadow-md dark:bg-neutral-800"
             >
               <div>
@@ -580,7 +635,7 @@ export default function HomePage({ onOpenVideo }) {
                   <ExternalLink className="size-3" />
                 </a>
               </div>
-            </article>
+            </RevealBlock>
           ))}
         </div>
 
@@ -597,7 +652,7 @@ export default function HomePage({ onOpenVideo }) {
       {/* SECTION 10: TRUSTED WITH CUSTOM PATCHES SINCE 2003 + Hang-Tag Price Card */}
       <section className="relative isolate overflow-clip bg-primary-800 py-20 text-white md:py-24 dark:bg-primary-950">
         <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-12">
-          <div className="lg:col-span-7">
+          <RevealBlock variant="blur-up" delay={40} className="lg:col-span-7">
             <h2 className="font-heading text-4xl leading-[1.02] font-black tracking-tight text-balance uppercase sm:text-5xl">
               TRUSTED WITH CUSTOM PATCHES SINCE <span className="text-accent">2003</span>
             </h2>
@@ -648,7 +703,7 @@ export default function HomePage({ onOpenVideo }) {
                 <span className="text-sm font-semibold text-white">4.8/5 Google Reviews</span>
               </div>
             </div>
-          </div>
+          </RevealBlock>
 
           {/* Right Hang-Tag Spec Card */}
           <div className="lg:col-span-5">
@@ -727,12 +782,16 @@ export default function HomePage({ onOpenVideo }) {
       {/* SECTION 11: Trusted by Top Organizations (Infinite Marquee) */}
       <section className="overflow-hidden bg-white py-20 shadow-sm xl:py-24 dark:bg-neutral-800/50">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-          <h2 className="font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent">
-            Trusted by Top Organizations
-          </h2>
-          <p className="mt-3 text-base text-neutral-600 sm:text-lg dark:text-neutral-300">
+          <MaskedText
+            as="h2"
+            text="Trusted by Top Organizations"
+            delay={0}
+            wordStep={50}
+            className="font-heading text-4xl leading-tight font-bold text-balance text-primary md:text-5xl dark:text-accent"
+          />
+          <RevealBlock as="p" variant="fade-up" delay={160} className="mt-3 text-base text-neutral-600 sm:text-lg dark:text-neutral-300">
             From sports teams and businesses to military units and event organizers, we’re the go-to source for high-quality custom patches.
-          </p>
+          </RevealBlock>
         </div>
 
         <div className="marquee-wrapper mt-12 overflow-hidden py-4">
@@ -767,13 +826,17 @@ export default function HomePage({ onOpenVideo }) {
           className="absolute inset-0 -z-10 bg-linear-to-t from-primary-950 via-primary-950/75 to-primary-950/15 sm:bg-linear-to-r sm:from-primary-950 sm:via-primary-950/90 sm:to-primary-950/20"
         />
         <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-24 sm:px-6 sm:py-14">
-          <h2 className="font-heading text-[30px] leading-tight font-black tracking-tight text-white uppercase sm:text-5xl">
-            HOW TO IRON ON A PATCH
-          </h2>
-          <p className="mt-2 max-w-lg text-base text-primary-100 sm:text-lg">
+          <MaskedText
+            as="h2"
+            text="HOW TO IRON ON A PATCH"
+            delay={0}
+            wordStep={45}
+            className="font-heading text-[30px] leading-tight font-black tracking-tight text-white uppercase sm:text-5xl"
+          />
+          <RevealBlock as="p" variant="blur-up" delay={180} className="mt-2 max-w-lg text-base text-primary-100 sm:text-lg">
             Prep, place, press — the whole process in about three minutes.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center gap-4">
+          </RevealBlock>
+          <RevealBlock variant="scale-up" delay={260} className="mt-6 flex flex-wrap items-center gap-4">
             <Link
               to="/how-to-iron-on-patches"
               className="inline-flex min-h-12 items-center gap-3 rounded-full bg-accent px-7 py-2.5 font-heading text-lg font-bold tracking-wide text-white uppercase no-underline shadow-lg transition hover:bg-accent-600"
@@ -781,16 +844,20 @@ export default function HomePage({ onOpenVideo }) {
               <Play className="size-4 fill-current" />
               WATCH THE VIDEO <span className="text-sm font-normal opacity-90">3:02</span>
             </Link>
-          </div>
+          </RevealBlock>
         </div>
       </aside>
 
       {/* SECTION 13: The Latest Posts From Our Blog */}
       <aside className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
-          <h2 className="font-heading text-4xl font-bold text-primary-800 dark:text-white">
-            The Latest Posts From Our Blog
-          </h2>
+          <MaskedText
+            as="h2"
+            text="The Latest Posts From Our Blog"
+            delay={0}
+            wordStep={40}
+            className="font-heading text-4xl font-bold text-primary-800 dark:text-white"
+          />
           <Link
             to="/blog/"
             className="font-heading text-base font-bold tracking-wider text-accent-600 uppercase no-underline hover:text-accent-700 dark:text-accent-400"
