@@ -44,16 +44,16 @@ export default function HomePage({ onOpenVideo }) {
     <main id="content" className="relative overflow-x-clip">
       {/* SECTION 1: Hero Banner + BUILD YOUR PERFECT PATCH 6-Card Grid */}
       <div className="relative isolate -mt-[calc(6rem+var(--below-main-nav-height,2.5rem))] overflow-x-clip pt-[calc(6rem+var(--below-main-nav-height,2.5rem))] pb-14">
-        {/* Background photo + teal gradient overlay */}
+        {/* Background photo + subtle blur + teal gradient overlay */}
         <img
           src={ASSETS.wallOPatches}
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 -z-20 size-full object-cover object-left-top"
+          className="absolute inset-0 -z-20 size-full scale-[1.03] object-cover object-center blur-[2.5px]"
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-linear-to-b from-primary-950/75 via-primary-800/80 to-primary-600/90 backdrop-blur-[2px] dark:from-primary-950/80 dark:to-primary-950/95"
+          className="absolute inset-0 -z-10 bg-linear-to-b from-primary-950/65 via-primary-900/55 to-primary-700/75 dark:from-primary-950/75 dark:via-primary-950/65 dark:to-primary-950/90"
         />
 
         <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:pt-10">
