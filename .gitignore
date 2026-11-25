@@ -5,3 +5,5 @@ dist/
 .env
 .env.*
 footer wave.mp4
+
+!.env.example

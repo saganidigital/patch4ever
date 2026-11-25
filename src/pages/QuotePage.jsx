@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Check, CheckCircle2, Mail, Phone, Upload, X } from 'lucide-react'
 import { CONTACT, PATCH_TYPES } from '../data/siteData'
 import { lookupUnitPrice } from '../data/pricingData'
-import { createOrder } from '../data/orderStore'
+import { createOrderAsync, validateArtworkFile } from '../data/orderStore'
 
 const DIMENSIONS = ['0.50', '1.00', '1.50', '2.00', '2.50', '3.00', '3.50', '4.00', '4.50', '5.00', '6.00', '7.00', '8.00', '10.00', '12.00']
 const QUICK_SIZES = ['2', '2.5', '3', '3.5', '4']
@@ -45,6 +45,7 @@ export default function QuotePage() {
   const [phone, setPhone] = useState('')
   const [company, setCompany] = useState('')
   const [inHandsDate, setInHandsDate] = useState('')
+  const [fileError, setFileError] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
   const avgSize = useMemo(() => {
@@ -58,18 +59,29 @@ export default function QuotePage() {
 
   const handleFiles = (fileList) => {
     if (!fileList) return
-    const incoming = Array.from(fileList).map((f) => ({
-      name: f.name,
-      sizeKb: Math.max(1, Math.round(f.size / 1024)),
-    }))
-    setFiles((prev) => [...prev, ...incoming])
+    setFileError('')
+    const incoming = []
+    for (const f of Array.from(fileList)) {
+      const check = validateArtworkFile(f)
+      if (!check.valid) {
+        setFileError(check.error)
+        continue
+      }
+      incoming.push({
+        name: f.name,
+        sizeKb: Math.max(1, Math.round(f.size / 1024)),
+      })
+    }
+    if (incoming.length > 0) {
+      setFiles((prev) => [...prev, ...incoming].slice(0, 10))
+    }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!fullName.trim() || !email.trim()) return
     const unitPrice = lookupUnitPrice({ patchType, sizeInches: Number(avgSize), qty })
-    createOrder({
+    await createOrderAsync({
       source: 'Free Quote',
       patchType,
       shape: 'Custom',
@@ -372,15 +384,22 @@ export default function QuotePage() {
                   Drop your design or click to browse
                 </span>
                 <span className="mt-1 text-xs text-neutral-500">
-                  JPG, PNG, GIF, PDF, AI, EPS, SVG, PSD, up to 25MB
+                  JPG, PNG, GIF, WEBP, PDF, AI, EPS, PSD, up to 10MB
                 </span>
                 <input
                   type="file"
                   multiple
+                  accept=".png,.jpg,.jpeg,.webp,.gif,.pdf,.ai,.eps,.psd"
                   className="sr-only"
                   onChange={(e) => handleFiles(e.target.files)}
                 />
               </label>
+
+              {fileError && (
+                <p className="mt-2 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-300">
+                  {fileError}
+                </p>
+              )}
 
               {files.length > 0 && (
                 <ul className="mt-3 space-y-1.5">
@@ -408,6 +427,7 @@ export default function QuotePage() {
                 <textarea
                   id="design-notes"
                   rows={4}
+                  maxLength={2000}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Tell us about colors, text changes, thread preferences, or anything else our artists should know..."
@@ -427,6 +447,7 @@ export default function QuotePage() {
                   <input
                     required
                     type="text"
+                    maxLength={100}
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     className="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
@@ -437,6 +458,7 @@ export default function QuotePage() {
                   <input
                     required
                     type="email"
+                    maxLength={150}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
@@ -446,6 +468,7 @@ export default function QuotePage() {
                   <label className="mb-1 block text-sm font-bold">Phone Number</label>
                   <input
                     type="tel"
+                    maxLength={30}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"
@@ -455,6 +478,7 @@ export default function QuotePage() {
                   <label className="mb-1 block text-sm font-bold">Company or Organization</label>
                   <input
                     type="text"
+                    maxLength={120}
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
                     className="w-full rounded-xl border border-neutral-300 bg-white px-3.5 py-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900"

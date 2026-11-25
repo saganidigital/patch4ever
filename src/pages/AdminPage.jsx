@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
+  AlertTriangle,
   ArrowLeft,
   BarChart3,
   CheckCircle2,
@@ -27,19 +28,14 @@ import {
 import Logo from '../components/Logo'
 import {
   ORDER_STATUSES,
-  deleteOrder,
+  deleteOrderAsync,
   exportOrdersCsv,
   loadCatalogConfig,
-  loadOrders,
+  loadOrdersAsync,
   resetCatalogConfig,
   saveCatalogConfig,
-  updateOrder,
+  updateOrderAsync,
 } from '../data/orderStore'
-
-const ADMIN_AUTH_KEY = 'p4e-admin-session-v2'
-const ADMIN_REMEMBER_KEY = 'p4e-admin-remember'
-const DEMO_EMAIL = 'admin@patch4ever.com'
-const DEMO_PASS = 'patch4ever2026'
 
 const CATEGORY_TABS = [
   { id: 'all', label: 'All Categories' },
@@ -52,15 +48,10 @@ const CATEGORY_TABS = [
 ]
 
 export default function AdminPage() {
-  const [authed, setAuthed] = useState(() => {
-    try {
-      if (sessionStorage.getItem(ADMIN_AUTH_KEY) === '1') return true
-      if (localStorage.getItem(ADMIN_REMEMBER_KEY) === '1') return true
-      return false
-    } catch {
-      return false
-    }
-  })
+  const [authed, setAuthed] = useState(false)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [serverMisconfigured, setServerMisconfigured] = useState(false)
+  const [adminEmail, setAdminEmail] = useState('')
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPass, setLoginPass] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -69,7 +60,7 @@ export default function AdminPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [section, setSection] = useState('dashboard') // dashboard | orders | categories
-  const [orders, setOrders] = useState(() => loadOrders())
+  const [orders, setOrders] = useState([])
   const [catalog, setCatalog] = useState(() => loadCatalogConfig())
 
   const [categoryFilter, setCategoryFilter] = useState('all')
@@ -78,44 +69,106 @@ export default function AdminPage() {
   const [selectedOrderId, setSelectedOrderId] = useState(null)
   const [savedBanner, setSavedBanner] = useState('')
 
-  const handleLogin = (e) => {
+  useEffect(() => {
+    try {
+      sessionStorage.removeItem('p4e-admin-session-v2')
+      localStorage.removeItem('p4e-admin-remember')
+      localStorage.removeItem('p4e-admin-session')
+    } catch {
+      // ignore storage cleanup errors
+    }
+
+    let cancelled = false
+    async function verifySession() {
+      try {
+        const res = await fetch('/api/admin/session', {
+          method: 'GET',
+          credentials: 'same-origin',
+        })
+        if (cancelled) return
+        if (res.status === 503) {
+          setServerMisconfigured(true)
+          setAuthed(false)
+        } else if (res.ok) {
+          const data = await res.json()
+          if (data?.authenticated) {
+            setAuthed(true)
+            setAdminEmail(data.email || '')
+          }
+        }
+      } catch {
+        // leave unauthenticated if session check fails
+      } finally {
+        if (!cancelled) setAuthLoading(false)
+      }
+    }
+    verifySession()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!authed) {
+      setOrders([])
+      return
+    }
+    let cancelled = false
+    loadOrdersAsync().then((loaded) => {
+      if (!cancelled) setOrders(loaded)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [authed])
+
+  const handleLogin = async (e) => {
     e.preventDefault()
     setLoginError('')
     setIsSubmitting(true)
 
-    const normalized = loginEmail.trim().toLowerCase()
-    const validEmails = ['admin@patch4ever.com', 'admin', 'admin@patches4less.com']
-    const validPasswords = ['patch4ever2026', 'admin', 'admin123', 'patch4less']
-
-    setTimeout(() => {
-      if (validEmails.includes(normalized) && validPasswords.includes(loginPass)) {
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+          email: loginEmail.trim(),
+          password: loginPass,
+          rememberMe,
+        }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (res.ok && data?.authenticated) {
         setAuthed(true)
-        try {
-          sessionStorage.setItem(ADMIN_AUTH_KEY, '1')
-          if (rememberMe) {
-            localStorage.setItem(ADMIN_REMEMBER_KEY, '1')
-          } else {
-            localStorage.removeItem(ADMIN_REMEMBER_KEY)
-          }
-        } catch {
-          // ignore
-        }
+        setAdminEmail(data.email || loginEmail.trim())
+        setServerMisconfigured(false)
+        setLoginPass('')
+        setLoginError('')
       } else {
-        setLoginError('Invalid credentials. Check username & password or click Auto-fill below.')
+        if (res.status === 503) setServerMisconfigured(true)
+        setLoginError(data?.error || 'Sign in failed. Please check your credentials.')
       }
+    } catch {
+      setLoginError('Unable to reach authentication server. Please try again.')
+    } finally {
       setIsSubmitting(false)
-    }, 250)
+    }
   }
 
-  const handleLogout = () => {
-    setAuthed(false)
+  const handleLogout = async () => {
     try {
-      sessionStorage.removeItem(ADMIN_AUTH_KEY)
-      localStorage.removeItem(ADMIN_REMEMBER_KEY)
-      localStorage.removeItem('p4e-admin-session')
+      await fetch('/api/admin/logout', {
+        method: 'POST',
+        credentials: 'same-origin',
+      })
     } catch {
-      // ignore
+      // ignore network failure on logout
     }
+    setAuthed(false)
+    setOrders([])
+    setSelectedOrderId(null)
+    setAdminEmail('')
   }
 
   const stats = useMemo(() => {
@@ -150,16 +203,19 @@ export default function AdminPage() {
 
   const selectedOrder = orders.find((o) => o.id === selectedOrderId) || null
 
-  const handleStatusChange = (orderId, nextStatus) => {
-    setOrders(updateOrder(orderId, { status: nextStatus }))
+  const handleStatusChange = async (orderId, nextStatus) => {
+    const updated = await updateOrderAsync(orderId, { status: nextStatus })
+    setOrders(updated)
   }
 
-  const handleNotesChange = (orderId, adminNotes) => {
-    setOrders(updateOrder(orderId, { adminNotes }))
+  const handleNotesChange = async (orderId, adminNotes) => {
+    const updated = await updateOrderAsync(orderId, { adminNotes })
+    setOrders(updated)
   }
 
-  const handleDeleteOrder = (orderId) => {
-    setOrders(deleteOrder(orderId))
+  const handleDeleteOrder = async (orderId) => {
+    const updated = await deleteOrderAsync(orderId)
+    setOrders(updated)
     if (selectedOrderId === orderId) setSelectedOrderId(null)
   }
 
@@ -168,6 +224,20 @@ export default function AdminPage() {
     saveCatalogConfig(nextConfig)
     setSavedBanner(message)
     setTimeout(() => setSavedBanner(''), 2500)
+  }
+
+  // SESSION CHECK LOADING SCREEN
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-neutral-950 px-4 text-white">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Loader2 className="size-8 animate-spin text-accent" />
+          <p className="font-heading text-sm font-bold tracking-widest text-neutral-400 uppercase">
+            Verifying Admin Session...
+          </p>
+        </div>
+      </div>
+    )
   }
 
   // LOGIN SCREEN
@@ -186,30 +256,49 @@ export default function AdminPage() {
             </Link>
 
             <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1 font-heading text-[11px] font-black tracking-widest text-accent-300 uppercase">
-              <ShieldCheck className="size-3.5 text-accent" /> Secure Admin Portal
+              <ShieldCheck className="size-3.5 text-accent" /> Admin Portal
             </span>
 
             <h1 className="mt-3 font-heading text-3xl font-black tracking-tight uppercase">
               Admin Sign In
             </h1>
             <p className="mt-1 text-sm text-neutral-400">
-              Access real-time orders, customer proofs, live catalog controls, and pricing settings.
+              Sign in with your administrator account to manage orders and catalog settings.
             </p>
           </div>
+
+          {serverMisconfigured && (
+            <div className="mb-5 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-xs text-amber-200">
+              <div className="flex items-start gap-2.5">
+                <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-400" />
+                <div>
+                  <p className="font-bold text-amber-100 uppercase">Server Authentication Not Configured</p>
+                  <p className="mt-1 leading-relaxed text-amber-200/90">
+                    Set <code className="text-white">ADMIN_EMAIL</code>, <code className="text-white">ADMIN_PASSWORD_HASH</code>, and{' '}
+                    <code className="text-white">ADMIN_SESSION_SECRET</code> in your Vercel Environment Variables (or{' '}
+                    <code className="text-white">.env.local</code> for local dev). Run{' '}
+                    <code className="text-white">node scripts/hash-password.mjs</code> to generate credentials.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="mb-1.5 flex items-center justify-between text-xs font-bold tracking-wider text-neutral-300 uppercase">
-                <span>Username or Email</span>
+                <span>Administrator Email</span>
               </label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-neutral-400">
                   <User className="size-4" />
                 </div>
                 <input
-                  type="text"
+                  type="email"
                   required
+                  autoComplete="email"
                   autoFocus
+                  maxLength={254}
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   placeholder="admin@patch4ever.com"
@@ -229,6 +318,8 @@ export default function AdminPage() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete="current-password"
+                  maxLength={256}
                   value={loginPass}
                   onChange={(e) => setLoginPass(e.target.value)}
                   placeholder="Enter administrator password"
@@ -253,7 +344,7 @@ export default function AdminPage() {
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="size-4 rounded border-white/20 bg-neutral-950 text-accent focus:ring-accent"
                 />
-                <span>Remember me on this browser</span>
+                <span>Keep session active for 7 days</span>
               </label>
             </div>
 
@@ -280,38 +371,9 @@ export default function AdminPage() {
             </button>
           </form>
 
-          {/* Quick Demo Credentials */}
-          <div className="mt-6 rounded-2xl border border-white/10 bg-neutral-950/70 p-4 text-xs text-neutral-300">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-white uppercase tracking-wider text-[11px]">Demo Credentials</span>
-              <span className="rounded bg-accent/20 px-2 py-0.5 font-heading text-[10px] font-bold text-accent-300 uppercase">Instant Access</span>
-            </div>
-            <div className="mt-2.5 space-y-1 font-mono text-[11px]">
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-400">Username:</span>
-                <code className="text-accent-300">{DEMO_EMAIL}</code>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-neutral-400">Password:</span>
-                <code className="text-accent-300">{DEMO_PASS}</code>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setLoginEmail(DEMO_EMAIL)
-                setLoginPass(DEMO_PASS)
-                setLoginError('')
-              }}
-              className="mt-3 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-accent/30 bg-accent/10 py-1.5 font-heading text-xs font-bold text-accent-300 transition hover:bg-accent hover:text-white"
-            >
-              ⚡ Auto-fill Demo Credentials
-            </button>
-          </div>
-
           <div className="mt-6 flex flex-col items-center gap-3 text-center">
             <p className="flex items-center gap-1.5 text-[11px] text-neutral-400">
-              <ShieldCheck className="size-3.5 text-accent" /> 256-bit SSL encrypted • Role-based authorization
+              <ShieldCheck className="size-3.5 text-accent" /> Server-verified session via HttpOnly cookies
             </p>
             <Link
               to="/"
@@ -362,6 +424,11 @@ export default function AdminPage() {
         </nav>
 
         <div className="hidden space-y-2 border-t border-white/10 p-4 lg:block">
+          {adminEmail && (
+            <p className="truncate px-1 text-center text-[11px] font-semibold text-primary-300" title={adminEmail}>
+              Signed in: {adminEmail}
+            </p>
+          )}
           <Link
             to="/make-your-own-patches"
             className="flex items-center justify-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-xs font-bold text-white no-underline hover:bg-white/20"

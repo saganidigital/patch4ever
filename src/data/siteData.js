@@ -377,7 +377,6 @@ export const FOOTER_LINKS = {
     { label: 'Pricing', href: '/pricing' },
     { label: 'Pay Online', href: '/payment-form' },
     { label: 'Customer Portal', href: 'https://orders.tjmpromos.com', external: true },
-    { label: 'Admin Panel', href: '/admin' },
     { label: 'Sitemap', href: '/sitemap' },
   ],
 }

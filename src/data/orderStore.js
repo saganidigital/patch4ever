@@ -1,7 +1,33 @@
-// Persistent localStorage store for Patch4Ever Orders & Order Page Categories
+// Encrypted browser store for Patch4Ever Orders & Order Page Categories
+import { getEncryptedItem, setEncryptedItem } from '../utils/cryptoStore'
 
-const ORDERS_KEY = 'p4e-orders-v1'
+const LEGACY_ORDERS_KEY = 'p4e-orders-v1'
+const ORDERS_KEY = 'p4e-orders-enc-v2'
 const CATALOG_KEY = 'p4e-catalog-config-v1'
+
+export const ALLOWED_ARTWORK_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp', '.gif', '.pdf', '.ai', '.eps', '.psd']
+export const MAX_ARTWORK_BYTES = 10 * 1024 * 1024 // 10 MB
+
+export function validateArtworkFile(file) {
+  if (!file || typeof file.name !== 'string') {
+    return { valid: false, error: 'Invalid file selected.' }
+  }
+  const dotIdx = file.name.lastIndexOf('.')
+  const ext = dotIdx >= 0 ? file.name.slice(dotIdx).toLowerCase() : ''
+  if (!ALLOWED_ARTWORK_EXTENSIONS.includes(ext)) {
+    return {
+      valid: false,
+      error: `Unsupported file type "${ext || 'unknown'}". Allowed: JPG, PNG, GIF, WEBP, PDF, AI, EPS, PSD.`,
+    }
+  }
+  if (typeof file.size === 'number' && file.size > MAX_ARTWORK_BYTES) {
+    return {
+      valid: false,
+      error: `File "${file.name}" exceeds the 10 MB upload limit.`,
+    }
+  }
+  return { valid: true }
+}
 
 export const ORDER_STATUSES = [
   { id: 'proof-pending', label: 'Proof Pending', badge: 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300' },
@@ -128,7 +154,7 @@ const SEED_ORDERS = [
     company: 'Ironwood Coffee Roasters',
     address: '1204 S Congress Ave, Austin, TX 78704',
     inHandsDate: '2026-12-15',
-    artworkName: 'ironwood-anvil-badge.svg',
+    artworkName: 'ironwood-anvil-badge.pdf',
     notes: 'Dark saddle brown faux leather for Richardson 112 trucker hats.',
     adminNotes: 'Proof v1 emailed — awaiting final sign-off.',
   },
@@ -212,7 +238,7 @@ const SEED_ORDERS = [
     company: 'Apex Motorsport Garage',
     address: '2200 Pit Lane, Tampa, FL 33605',
     inHandsDate: '2026-11-28',
-    artworkName: 'crew-names-roster.csv',
+    artworkName: 'crew-names-roster.pdf',
     notes: 'Navy twill background, white block script, orange merrowed edge.',
     adminNotes: 'Delivered and confirmed by customer (5-star review).',
   },
@@ -246,60 +272,134 @@ const SEED_ORDERS = [
   },
 ]
 
-export function loadOrders() {
+let ordersCache = null
+
+function cleanText(val, maxLen) {
+  if (typeof val !== 'string') return ''
+  return val.trim().slice(0, maxLen)
+}
+
+function clampNumber(val, min, max, fallback) {
+  const n = Number(val)
+  if (!Number.isFinite(n)) return fallback
+  return Math.min(max, Math.max(min, n))
+}
+
+function sanitizeOrderInput(data) {
+  const qty = Math.round(clampNumber(data?.qty, 1, 1000000, 10))
+  const unitPrice = Number(clampNumber(data?.unitPrice, 0, 10000, 0).toFixed(2))
+  const totalPrice = Number(clampNumber(data?.totalPrice, 0, 10000000, unitPrice * qty).toFixed(2))
+
+  return {
+    ...data,
+    source: cleanText(data?.source || 'Order Page', 40),
+    patchType: cleanText(data?.patchType || 'embroidered', 40),
+    shape: cleanText(data?.shape || 'Custom', 60),
+    width: cleanText(String(data?.width ?? '3.00'), 16),
+    height: cleanText(String(data?.height ?? '3.00'), 16),
+    size: clampNumber(data?.size, 0.5, 24, 3),
+    coverage: cleanText(data?.coverage || 'Standard', 80),
+    border: cleanText(data?.border || 'Merrowed Border', 60),
+    backing: cleanText(data?.backing || 'No Backing', 60),
+    upgrades: Array.isArray(data?.upgrades)
+      ? data.upgrades.slice(0, 10).map((u) => cleanText(String(u), 80)).filter(Boolean)
+      : [],
+    qty,
+    rush: Boolean(data?.rush),
+    unitPrice,
+    totalPrice,
+    customerName: cleanText(data?.customerName, 100),
+    email: cleanText(data?.email, 150),
+    phone: cleanText(data?.phone, 30),
+    company: cleanText(data?.company, 120),
+    address: cleanText(data?.address, 250),
+    inHandsDate: cleanText(data?.inHandsDate, 30),
+    artworkName: cleanText(data?.artworkName || 'No file uploaded', 180),
+    notes: cleanText(data?.notes, 2000),
+    adminNotes: cleanText(data?.adminNotes, 2000),
+  }
+}
+
+export async function loadOrdersAsync() {
+  if (Array.isArray(ordersCache)) return ordersCache
   try {
-    const raw = localStorage.getItem(ORDERS_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw)
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed
+    const encrypted = await getEncryptedItem(ORDERS_KEY)
+    if (Array.isArray(encrypted) && encrypted.length > 0) {
+      ordersCache = encrypted
+      return encrypted
     }
   } catch {
-    // ignore storage errors
+    // ignore storage/decrypt errors and try migration or seed
   }
+
   try {
-    localStorage.setItem(ORDERS_KEY, JSON.stringify(SEED_ORDERS))
+    const legacyRaw = localStorage.getItem(LEGACY_ORDERS_KEY)
+    if (legacyRaw) {
+      const parsed = JSON.parse(legacyRaw)
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        ordersCache = parsed
+        await setEncryptedItem(ORDERS_KEY, parsed)
+        localStorage.removeItem(LEGACY_ORDERS_KEY)
+        return parsed
+      }
+    }
+  } catch {
+    // ignore migration errors
+  }
+
+  ordersCache = SEED_ORDERS
+  try {
+    await setEncryptedItem(ORDERS_KEY, SEED_ORDERS)
+    localStorage.removeItem(LEGACY_ORDERS_KEY)
   } catch {
     // ignore
   }
   return SEED_ORDERS
 }
 
-export function saveOrders(orders) {
+export async function saveOrdersAsync(orders) {
+  ordersCache = orders
   try {
-    localStorage.setItem(ORDERS_KEY, JSON.stringify(orders))
+    await setEncryptedItem(ORDERS_KEY, orders)
   } catch {
     // ignore
   }
 }
 
-export function createOrder(orderData) {
-  const existing = loadOrders()
+export async function createOrderAsync(orderData) {
+  const existing = await loadOrdersAsync()
   const maxNum = existing.reduce((max, o) => {
     const n = Number(String(o.id || '').replace(/\D/g, ''))
     return Number.isFinite(n) && n > max ? n : max
   }, 1048)
 
+  const sanitized = sanitizeOrderInput(orderData)
   const newOrder = {
     id: `P4E-${maxNum + 1}`,
     createdAt: new Date().toISOString(),
     status: 'proof-pending',
-    adminNotes: '',
-    ...orderData,
+    ...sanitized,
   }
   const updated = [newOrder, ...existing]
-  saveOrders(updated)
+  await saveOrdersAsync(updated)
   return newOrder
 }
 
-export function updateOrder(orderId, patch) {
-  const updated = loadOrders().map((o) => (o.id === orderId ? { ...o, ...patch } : o))
-  saveOrders(updated)
+export async function updateOrderAsync(orderId, patch) {
+  const existing = await loadOrdersAsync()
+  const safePatch = { ...patch }
+  if (typeof safePatch.adminNotes === 'string') {
+    safePatch.adminNotes = cleanText(safePatch.adminNotes, 2000)
+  }
+  const updated = existing.map((o) => (o.id === orderId ? { ...o, ...safePatch } : o))
+  await saveOrdersAsync(updated)
   return updated
 }
 
-export function deleteOrder(orderId) {
-  const updated = loadOrders().filter((o) => o.id !== orderId)
-  saveOrders(updated)
+export async function deleteOrderAsync(orderId) {
+  const existing = await loadOrdersAsync()
+  const updated = existing.filter((o) => o.id !== orderId)
+  await saveOrdersAsync(updated)
   return updated
 }
 
@@ -326,6 +426,15 @@ export function resetCatalogConfig() {
   return DEFAULT_CATALOG_CONFIG
 }
 
+function safeCsvCell(v) {
+  let str = String(v ?? '')
+  // Neutralize CSV formula injection (=, +, -, @, tab, CR)
+  if (/^\s*[=+\-@\t\r]/.test(str)) {
+    str = `'${str}`
+  }
+  return `"${str.replace(/"/g, '""')}"`
+}
+
 export function exportOrdersCsv(orders) {
   const headers = [
     'Order ID',
@@ -348,7 +457,6 @@ export function exportOrdersCsv(orders) {
     'Phone',
     'Company',
   ]
-  const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
   const rows = orders.map((o) =>
     [
       o.id,
@@ -364,17 +472,17 @@ export function exportOrdersCsv(orders) {
       (o.upgrades || []).join('; '),
       o.qty,
       o.rush ? 'Yes' : 'No',
-      o.unitPrice.toFixed(2),
-      o.totalPrice.toFixed(2),
+      Number(o.unitPrice || 0).toFixed(2),
+      Number(o.totalPrice || 0).toFixed(2),
       o.customerName,
       o.email,
       o.phone,
       o.company,
     ]
-      .map(esc)
+      .map(safeCsvCell)
       .join(','),
   )
-  const csv = [headers.map(esc).join(','), ...rows].join('\n')
+  const csv = [headers.map(safeCsvCell).join(','), ...rows].join('\n')
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

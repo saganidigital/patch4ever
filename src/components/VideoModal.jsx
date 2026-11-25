@@ -1,6 +1,8 @@
 import { useEffect } from 'react'
 import { X } from 'lucide-react'
 
+const YOUTUBE_ID_RE = /^[a-zA-Z0-9_-]{11}$/
+
 export default function VideoModal({ video, onClose }) {
   useEffect(() => {
     if (!video) return
@@ -11,7 +13,7 @@ export default function VideoModal({ video, onClose }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [video, onClose])
 
-  if (!video) return null
+  if (!video || !YOUTUBE_ID_RE.test(String(video.youtubeId || ''))) return null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-label={video.title}>
@@ -31,9 +33,11 @@ export default function VideoModal({ video, onClose }) {
         <div className="aspect-video w-full bg-black">
           <iframe
             className="size-full"
-            src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&rel=0`}
+            src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}?autoplay=1&rel=0`}
             title={video.title}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            sandbox="allow-scripts allow-same-origin allow-presentation"
+            referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen
           />
         </div>

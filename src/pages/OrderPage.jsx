@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
   Check,
@@ -17,7 +17,7 @@ import {
 } from 'lucide-react'
 import { lookupUnitPrice } from '../data/pricingData'
 import { CONTACT, PATCH_TYPES } from '../data/siteData'
-import { createOrder, loadCatalogConfig } from '../data/orderStore'
+import { createOrderAsync, loadCatalogConfig, validateArtworkFile } from '../data/orderStore'
 
 const SHAPES = [
   { id: 'Rectangle', label: 'Rectangle', icon: RectangleHorizontal },
@@ -60,6 +60,7 @@ export default function OrderPage({ onAddToCart }) {
 
   // Artwork & customer details
   const [artworkFile, setArtworkFile] = useState(null)
+  const [artworkError, setArtworkError] = useState('')
   const [notes, setNotes] = useState('')
   const [customerName, setCustomerName] = useState('')
   const [email, setEmail] = useState('')
@@ -68,6 +69,13 @@ export default function OrderPage({ onAddToCart }) {
   const [address, setAddress] = useState('')
   const [inHandsDate, setInHandsDate] = useState('')
   const [placedOrder, setPlacedOrder] = useState(null)
+
+  useEffect(() => {
+    const url = artworkFile?.previewUrl
+    return () => {
+      if (url) URL.revokeObjectURL(url)
+    }
+  }, [artworkFile])
 
   const typeConfig = catalog.patchTypes.find((t) => t.id === patchType) || catalog.patchTypes[0]
   const activeBorder = catalog.borders.find((b) => b.id === borderId) || catalog.borders[0]
@@ -124,7 +132,17 @@ export default function OrderPage({ onAddToCart }) {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const previewUrl = file.type.startsWith('image/') ? URL.createObjectURL(file) : null
+    setArtworkError('')
+    const check = validateArtworkFile(file)
+    if (!check.valid) {
+      setArtworkError(check.error)
+      e.target.value = ''
+      return
+    }
+    const previewUrl =
+      file.type.startsWith('image/') && file.type !== 'image/svg+xml'
+        ? URL.createObjectURL(file)
+        : null
     setArtworkFile({ name: file.name, sizeKb: Math.max(1, Math.round(file.size / 1024)), previewUrl })
   }
 
@@ -139,7 +157,7 @@ export default function OrderPage({ onAddToCart }) {
     })
   }
 
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault()
     if (!customerName.trim() || !email.trim()) return
 
@@ -147,7 +165,7 @@ export default function OrderPage({ onAddToCart }) {
       .map((id) => catalog.upgrades.find((u) => u.id === id)?.name)
       .filter(Boolean)
 
-    const saved = createOrder({
+    const saved = await createOrderAsync({
       source: 'Order Page',
       patchType,
       shape,
@@ -608,9 +626,20 @@ export default function OrderPage({ onAddToCart }) {
                 <span className="mt-2 font-heading text-lg font-bold text-primary-800 dark:text-white">
                   Upload logo, sketch, or reference image
                 </span>
-                <span className="mt-1 text-xs text-neutral-500">JPG, PNG, PDF, AI, EPS, SVG, PSD up to 25MB</span>
-                <input type="file" className="sr-only" onChange={handleFileChange} />
+                <span className="mt-1 text-xs text-neutral-500">JPG, PNG, GIF, WEBP, PDF, AI, EPS, PSD up to 10MB</span>
+                <input
+                  type="file"
+                  accept=".png,.jpg,.jpeg,.webp,.gif,.pdf,.ai,.eps,.psd"
+                  className="sr-only"
+                  onChange={handleFileChange}
+                />
               </label>
+
+              {artworkError && (
+                <p className="mt-2 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-300">
+                  {artworkError}
+                </p>
+              )}
 
               {artworkFile && (
                 <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-neutral-100 px-3.5 py-2.5 dark:bg-neutral-700">
@@ -636,6 +665,7 @@ export default function OrderPage({ onAddToCart }) {
 
               <textarea
                 rows={3}
+                maxLength={2000}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Thread colors, Pantone codes, border color, or special instructions..."
@@ -654,6 +684,7 @@ export default function OrderPage({ onAddToCart }) {
                   <input
                     required
                     type="text"
+                    maxLength={100}
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     placeholder="Alex Morgan"
@@ -665,6 +696,7 @@ export default function OrderPage({ onAddToCart }) {
                   <input
                     required
                     type="email"
+                    maxLength={150}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="alex@company.com"
@@ -675,6 +707,7 @@ export default function OrderPage({ onAddToCart }) {
                   <label className="mb-1 block text-sm font-bold">Phone Number</label>
                   <input
                     type="tel"
+                    maxLength={30}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="(555) 123-4567"
@@ -685,6 +718,7 @@ export default function OrderPage({ onAddToCart }) {
                   <label className="mb-1 block text-sm font-bold">Company / Organization</label>
                   <input
                     type="text"
+                    maxLength={120}
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
                     placeholder="Team or Brand Name"
@@ -695,6 +729,7 @@ export default function OrderPage({ onAddToCart }) {
                   <label className="mb-1 block text-sm font-bold">Shipping Address</label>
                   <input
                     type="text"
+                    maxLength={250}
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     placeholder="Street, City, State, ZIP"
