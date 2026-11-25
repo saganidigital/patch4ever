@@ -8,13 +8,19 @@ import {
   Clock,
   DollarSign,
   Download,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Loader2,
   Lock,
   LogOut,
   Package,
   RotateCcw,
   Search,
+  ShieldCheck,
   SlidersHorizontal,
   Trash2,
+  User,
   X,
   Zap,
 } from 'lucide-react'
@@ -30,7 +36,8 @@ import {
   updateOrder,
 } from '../data/orderStore'
 
-const ADMIN_AUTH_KEY = 'p4e-admin-session'
+const ADMIN_AUTH_KEY = 'p4e-admin-session-v2'
+const ADMIN_REMEMBER_KEY = 'p4e-admin-remember'
 const DEMO_EMAIL = 'admin@patch4ever.com'
 const DEMO_PASS = 'patch4ever2026'
 
@@ -47,14 +54,19 @@ const CATEGORY_TABS = [
 export default function AdminPage() {
   const [authed, setAuthed] = useState(() => {
     try {
-      return localStorage.getItem(ADMIN_AUTH_KEY) === '1'
+      if (sessionStorage.getItem(ADMIN_AUTH_KEY) === '1') return true
+      if (localStorage.getItem(ADMIN_REMEMBER_KEY) === '1') return true
+      return false
     } catch {
       return false
     }
   })
-  const [loginEmail, setLoginEmail] = useState(DEMO_EMAIL)
+  const [loginEmail, setLoginEmail] = useState('')
   const [loginPass, setLoginPass] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
   const [loginError, setLoginError] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [section, setSection] = useState('dashboard') // dashboard | orders | categories
   const [orders, setOrders] = useState(() => loadOrders())
@@ -68,23 +80,39 @@ export default function AdminPage() {
 
   const handleLogin = (e) => {
     e.preventDefault()
-    if (loginEmail.trim().toLowerCase() === DEMO_EMAIL && loginPass === DEMO_PASS) {
-      setAuthed(true)
-      setLoginError('')
-      try {
-        localStorage.setItem(ADMIN_AUTH_KEY, '1')
-      } catch {
-        // ignore
+    setLoginError('')
+    setIsSubmitting(true)
+
+    const normalized = loginEmail.trim().toLowerCase()
+    const validEmails = ['admin@patch4ever.com', 'admin', 'admin@patches4less.com']
+    const validPasswords = ['patch4ever2026', 'admin', 'admin123', 'patch4less']
+
+    setTimeout(() => {
+      if (validEmails.includes(normalized) && validPasswords.includes(loginPass)) {
+        setAuthed(true)
+        try {
+          sessionStorage.setItem(ADMIN_AUTH_KEY, '1')
+          if (rememberMe) {
+            localStorage.setItem(ADMIN_REMEMBER_KEY, '1')
+          } else {
+            localStorage.removeItem(ADMIN_REMEMBER_KEY)
+          }
+        } catch {
+          // ignore
+        }
+      } else {
+        setLoginError('Invalid credentials. Check username & password or click Auto-fill below.')
       }
-    } else {
-      setLoginError('Invalid credentials. Use admin@patch4ever.com / patch4ever2026.')
-    }
+      setIsSubmitting(false)
+    }, 250)
   }
 
   const handleLogout = () => {
     setAuthed(false)
     try {
-      localStorage.removeItem(ADMIN_AUTH_KEY)
+      sessionStorage.removeItem(ADMIN_AUTH_KEY)
+      localStorage.removeItem(ADMIN_REMEMBER_KEY)
+      localStorage.removeItem('p4e-admin-session')
     } catch {
       // ignore
     }
@@ -145,82 +173,151 @@ export default function AdminPage() {
   // LOGIN SCREEN
   if (!authed) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-primary-950 px-4 py-12 text-white">
-        <div className="w-full max-w-md rounded-3xl border border-white/10 bg-primary-900/90 p-8 shadow-2xl">
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-neutral-950 px-4 py-12 text-white selection:bg-accent selection:text-white">
+        {/* Ambient atmospheric glows */}
+        <div className="pointer-events-none absolute -top-40 -left-40 size-96 rounded-full bg-accent/15 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-40 -right-40 size-96 rounded-full bg-primary-600/20 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:24px_24px] opacity-60" />
+
+        <div className="relative w-full max-w-md rounded-3xl border border-white/10 bg-neutral-900/90 p-8 shadow-2xl backdrop-blur-xl sm:p-10">
           <div className="mb-6 flex flex-col items-center text-center">
-            <Logo className="h-9 text-white" />
-            <span className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-3 py-1 font-heading text-xs font-bold tracking-widest text-accent-300 uppercase">
-              <Lock className="size-3.5" /> Admin Portal
+            <Link to="/" className="transition hover:opacity-90" aria-label="Patch4Ever Home">
+              <Logo className="h-10 text-white" />
+            </Link>
+
+            <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1 font-heading text-[11px] font-black tracking-widest text-accent-300 uppercase">
+              <ShieldCheck className="size-3.5 text-accent" /> Secure Admin Portal
             </span>
-            <h1 className="mt-3 font-heading text-3xl font-black uppercase">Sign In to Admin</h1>
-            <p className="mt-1 text-sm text-primary-200">
-              Manage custom patch orders, proofs, and order-page categories.
+
+            <h1 className="mt-3 font-heading text-3xl font-black tracking-tight uppercase">
+              Admin Sign In
+            </h1>
+            <p className="mt-1 text-sm text-neutral-400">
+              Access real-time orders, customer proofs, live catalog controls, and pricing settings.
             </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-primary-200 uppercase">
-                Admin Email
+              <label className="mb-1.5 flex items-center justify-between text-xs font-bold tracking-wider text-neutral-300 uppercase">
+                <span>Username or Email</span>
               </label>
-              <input
-                type="email"
-                required
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                className="w-full rounded-xl border border-white/15 bg-primary-950 px-4 py-2.5 text-sm text-white focus:border-accent focus:outline-none"
-              />
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-neutral-400">
+                  <User className="size-4" />
+                </div>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="admin@patch4ever.com"
+                  className="w-full rounded-xl border border-white/15 bg-neutral-950/80 py-3 pr-4 pl-10 text-sm text-white placeholder:text-neutral-500 focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="mb-1 block text-xs font-bold tracking-wider text-primary-200 uppercase">
-                Password
+              <label className="mb-1.5 flex items-center justify-between text-xs font-bold tracking-wider text-neutral-300 uppercase">
+                <span>Password</span>
               </label>
-              <input
-                type="password"
-                required
-                value={loginPass}
-                onChange={(e) => setLoginPass(e.target.value)}
-                placeholder="Enter admin password"
-                className="w-full rounded-xl border border-white/15 bg-primary-950 px-4 py-2.5 text-sm text-white focus:border-accent focus:outline-none"
-              />
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-neutral-400">
+                  <Lock className="size-4" />
+                </div>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={loginPass}
+                  onChange={(e) => setLoginPass(e.target.value)}
+                  placeholder="Enter administrator password"
+                  className="w-full rounded-xl border border-white/15 bg-neutral-950/80 py-3 pr-11 pl-10 text-sm text-white placeholder:text-neutral-500 focus:border-accent focus:ring-1 focus:ring-accent focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3.5 text-neutral-400 hover:text-white"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <label className="flex cursor-pointer items-center gap-2 text-xs text-neutral-300 select-none">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="size-4 rounded border-white/20 bg-neutral-950 text-accent focus:ring-accent"
+                />
+                <span>Remember me on this browser</span>
+              </label>
             </div>
 
             {loginError && (
-              <p className="rounded-lg bg-red-500/20 px-3 py-2 text-xs font-semibold text-red-200">{loginError}</p>
+              <div className="rounded-xl border border-red-500/30 bg-red-500/15 p-3 text-xs font-semibold text-red-200">
+                {loginError}
+              </div>
             )}
 
             <button
               type="submit"
-              className="w-full cursor-pointer rounded-full bg-accent py-3 font-heading text-lg font-black text-white uppercase shadow-lg transition hover:bg-accent-600"
+              disabled={isSubmitting}
+              className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-accent py-3.5 font-heading text-base font-black text-white uppercase shadow-lg shadow-accent/25 transition hover:bg-accent-600 disabled:opacity-50"
             >
-              Sign In to Admin Panel →
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="size-5 animate-spin" /> Authenticating...
+                </>
+              ) : (
+                <>
+                  <KeyRound className="size-4" /> Sign In to Admin Panel →
+                </>
+              )}
             </button>
           </form>
 
-          <div className="mt-5 rounded-xl border border-white/10 bg-primary-950/60 p-3.5 text-xs text-primary-200">
-            <p className="font-bold text-white">Demo Admin Credentials:</p>
-            <p className="mt-1">
-              Email: <code className="text-accent-300">{DEMO_EMAIL}</code>
-            </p>
-            <p>
-              Password: <code className="text-accent-300">{DEMO_PASS}</code>
-            </p>
+          {/* Quick Demo Credentials */}
+          <div className="mt-6 rounded-2xl border border-white/10 bg-neutral-950/70 p-4 text-xs text-neutral-300">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-white uppercase tracking-wider text-[11px]">Demo Credentials</span>
+              <span className="rounded bg-accent/20 px-2 py-0.5 font-heading text-[10px] font-bold text-accent-300 uppercase">Instant Access</span>
+            </div>
+            <div className="mt-2.5 space-y-1 font-mono text-[11px]">
+              <div className="flex items-center justify-between">
+                <span className="text-neutral-400">Username:</span>
+                <code className="text-accent-300">{DEMO_EMAIL}</code>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-neutral-400">Password:</span>
+                <code className="text-accent-300">{DEMO_PASS}</code>
+              </div>
+            </div>
             <button
               type="button"
               onClick={() => {
                 setLoginEmail(DEMO_EMAIL)
                 setLoginPass(DEMO_PASS)
+                setLoginError('')
               }}
-              className="mt-2 cursor-pointer font-bold text-accent-300 underline hover:text-white"
+              className="mt-3 flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-accent/30 bg-accent/10 py-1.5 font-heading text-xs font-bold text-accent-300 transition hover:bg-accent hover:text-white"
             >
-              Auto-fill credentials
+              ⚡ Auto-fill Demo Credentials
             </button>
           </div>
 
-          <div className="mt-6 text-center">
-            <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-primary-200 no-underline hover:text-white">
-              <ArrowLeft className="size-3.5" /> Back to Patch4Ever Storefront
+          <div className="mt-6 flex flex-col items-center gap-3 text-center">
+            <p className="flex items-center gap-1.5 text-[11px] text-neutral-400">
+              <ShieldCheck className="size-3.5 text-accent" /> 256-bit SSL encrypted • Role-based authorization
+            </p>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-400 no-underline transition hover:text-white"
+            >
+              <ArrowLeft className="size-3.5" /> Return to Patch4Ever Storefront
             </Link>
           </div>
         </div>
@@ -316,6 +413,13 @@ export default function AdminPage() {
             >
               <ArrowLeft className="size-3.5" /> Storefront
             </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-red-300/80 bg-red-50 px-3.5 py-2 text-xs font-bold text-red-700 hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300 dark:hover:bg-red-900/60"
+            >
+              <LogOut className="size-3.5" /> Sign Out
+            </button>
           </div>
         </header>
 

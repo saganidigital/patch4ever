@@ -100,6 +100,8 @@ function AppShell() {
           <Route path="/quote" element={<QuotePage />} />
           <Route path="/pricing" element={<PricingPage onAddToCart={handleAddToCart} />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/login" element={<AdminPage />} />
+          <Route path="/admin/*" element={<AdminPage />} />
           <Route path="*" element={<CatalogPage onAddToCart={handleAddToCart} />} />
         </Routes>
       </div>
