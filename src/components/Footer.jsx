@@ -11,9 +11,19 @@ export default function Footer() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault()
-    if (!email.trim() || !email.includes('@')) return
+    const cleanEmail = email.trim()
+    if (!cleanEmail || !cleanEmail.includes('@')) return
+    try {
+      await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail }),
+      })
+    } catch {
+      // allow graceful UX if DB not configured yet
+    }
     setSubscribed(true)
     setEmail('')
   }

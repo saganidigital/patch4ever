@@ -320,7 +320,7 @@ function sanitizeOrderInput(data) {
   }
 }
 
-export async function loadOrdersAsync() {
+async function loadOrdersLocalFallback() {
   if (Array.isArray(ordersCache)) return ordersCache
   try {
     const encrypted = await getEncryptedItem(ORDERS_KEY)
@@ -357,6 +357,28 @@ export async function loadOrdersAsync() {
   return SEED_ORDERS
 }
 
+export async function loadOrdersAsync() {
+  try {
+    const res = await fetch('/api/orders', {
+      method: 'GET',
+      credentials: 'same-origin',
+    })
+    if (res.ok) {
+      const data = await res.json()
+      if (Array.isArray(data?.orders)) {
+        ordersCache = data.orders
+        return data.orders
+      }
+    }
+    if (res.status !== 503) {
+      return ordersCache || []
+    }
+  } catch {
+    // offline or local-only mode -> fallback below
+  }
+  return loadOrdersLocalFallback()
+}
+
 export async function saveOrdersAsync(orders) {
   ordersCache = orders
   try {
@@ -367,13 +389,34 @@ export async function saveOrdersAsync(orders) {
 }
 
 export async function createOrderAsync(orderData) {
-  const existing = await loadOrdersAsync()
+  const sanitized = sanitizeOrderInput(orderData)
+
+  try {
+    const res = await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(sanitized),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      if (data?.order) {
+        if (Array.isArray(ordersCache)) {
+          ordersCache = [data.order, ...ordersCache]
+        }
+        return data.order
+      }
+    }
+  } catch {
+    // fallback to encrypted local store when Supabase isn't configured yet
+  }
+
+  const existing = await loadOrdersLocalFallback()
   const maxNum = existing.reduce((max, o) => {
     const n = Number(String(o.id || '').replace(/\D/g, ''))
     return Number.isFinite(n) && n > max ? n : max
   }, 1048)
 
-  const sanitized = sanitizeOrderInput(orderData)
   const newOrder = {
     id: `P4E-${maxNum + 1}`,
     createdAt: new Date().toISOString(),
@@ -386,18 +429,52 @@ export async function createOrderAsync(orderData) {
 }
 
 export async function updateOrderAsync(orderId, patch) {
-  const existing = await loadOrdersAsync()
   const safePatch = { ...patch }
   if (typeof safePatch.adminNotes === 'string') {
     safePatch.adminNotes = cleanText(safePatch.adminNotes, 2000)
   }
+
+  try {
+    const res = await fetch(`/api/orders?id=${encodeURIComponent(orderId)}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify(safePatch),
+    })
+    if (res.ok) {
+      const data = await res.json()
+      const current = Array.isArray(ordersCache) ? ordersCache : []
+      const updated = current.map((o) => (o.id === orderId ? data.order || { ...o, ...safePatch } : o))
+      ordersCache = updated
+      return updated
+    }
+  } catch {
+    // fallback below
+  }
+
+  const existing = await loadOrdersLocalFallback()
   const updated = existing.map((o) => (o.id === orderId ? { ...o, ...safePatch } : o))
   await saveOrdersAsync(updated)
   return updated
 }
 
 export async function deleteOrderAsync(orderId) {
-  const existing = await loadOrdersAsync()
+  try {
+    const res = await fetch(`/api/orders?id=${encodeURIComponent(orderId)}`, {
+      method: 'DELETE',
+      credentials: 'same-origin',
+    })
+    if (res.ok) {
+      const current = Array.isArray(ordersCache) ? ordersCache : []
+      const updated = current.filter((o) => o.id !== orderId)
+      ordersCache = updated
+      return updated
+    }
+  } catch {
+    // fallback below
+  }
+
+  const existing = await loadOrdersLocalFallback()
   const updated = existing.filter((o) => o.id !== orderId)
   await saveOrdersAsync(updated)
   return updated
@@ -413,6 +490,25 @@ export function loadCatalogConfig() {
   return DEFAULT_CATALOG_CONFIG
 }
 
+export async function loadCatalogConfigAsync() {
+  try {
+    const res = await fetch('/api/catalog', {
+      method: 'GET',
+      credentials: 'same-origin',
+    })
+    if (res.ok) {
+      const data = await res.json()
+      if (data?.config) {
+        saveCatalogConfig(data.config)
+        return data.config
+      }
+    }
+  } catch {
+    // fallback to localStorage
+  }
+  return loadCatalogConfig()
+}
+
 export function saveCatalogConfig(config) {
   try {
     localStorage.setItem(CATALOG_KEY, JSON.stringify(config))
@@ -421,9 +517,28 @@ export function saveCatalogConfig(config) {
   }
 }
 
+export async function saveCatalogConfigAsync(config) {
+  saveCatalogConfig(config)
+  try {
+    await fetch('/api/catalog', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'same-origin',
+      body: JSON.stringify({ config }),
+    })
+  } catch {
+    // local copy already persisted
+  }
+  return config
+}
+
 export function resetCatalogConfig() {
   saveCatalogConfig(DEFAULT_CATALOG_CONFIG)
   return DEFAULT_CATALOG_CONFIG
+}
+
+export async function resetCatalogConfigAsync() {
+  return saveCatalogConfigAsync(DEFAULT_CATALOG_CONFIG)
 }
 
 function safeCsvCell(v) {

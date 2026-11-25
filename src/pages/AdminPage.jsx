@@ -31,9 +31,10 @@ import {
   deleteOrderAsync,
   exportOrdersCsv,
   loadCatalogConfig,
+  loadCatalogConfigAsync,
   loadOrdersAsync,
-  resetCatalogConfig,
-  saveCatalogConfig,
+  resetCatalogConfigAsync,
+  saveCatalogConfigAsync,
   updateOrderAsync,
 } from '../data/orderStore'
 
@@ -116,6 +117,9 @@ export default function AdminPage() {
     let cancelled = false
     loadOrdersAsync().then((loaded) => {
       if (!cancelled) setOrders(loaded)
+    })
+    loadCatalogConfigAsync().then((loadedCatalog) => {
+      if (!cancelled && loadedCatalog) setCatalog(loadedCatalog)
     })
     return () => {
       cancelled = true
@@ -219,9 +223,9 @@ export default function AdminPage() {
     if (selectedOrderId === orderId) setSelectedOrderId(null)
   }
 
-  const updateCatalogAndPersist = (nextConfig, message = 'Order page settings saved!') => {
+  const updateCatalogAndPersist = async (nextConfig, message = 'Order page settings saved!') => {
     setCatalog(nextConfig)
-    saveCatalogConfig(nextConfig)
+    await saveCatalogConfigAsync(nextConfig)
     setSavedBanner(message)
     setTimeout(() => setSavedBanner(''), 2500)
   }
@@ -764,7 +768,12 @@ export default function AdminPage() {
                 </p>
                 <button
                   type="button"
-                  onClick={() => updateCatalogAndPersist(resetCatalogConfig(), 'Reset to default categories & pricing!')}
+                  onClick={async () => {
+                    const fresh = await resetCatalogConfigAsync()
+                    setCatalog(fresh)
+                    setSavedBanner('Reset to default categories & pricing!')
+                    setTimeout(() => setSavedBanner(''), 2500)
+                  }}
                   className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-neutral-300 bg-white px-3.5 py-2 text-xs font-bold text-neutral-700 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
                 >
                   <RotateCcw className="size-3.5" /> Reset Defaults

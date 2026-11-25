@@ -17,7 +17,12 @@ import {
 } from 'lucide-react'
 import { lookupUnitPrice } from '../data/pricingData'
 import { CONTACT, PATCH_TYPES } from '../data/siteData'
-import { createOrderAsync, loadCatalogConfig, validateArtworkFile } from '../data/orderStore'
+import {
+  createOrderAsync,
+  loadCatalogConfig,
+  loadCatalogConfigAsync,
+  validateArtworkFile,
+} from '../data/orderStore'
 
 const SHAPES = [
   { id: 'Rectangle', label: 'Rectangle', icon: RectangleHorizontal },
@@ -33,7 +38,17 @@ const QTY_TIERS = [10, 20, 50, 100, 200, 300, 500, 1000, 2000]
 
 export default function OrderPage({ onAddToCart }) {
   const [searchParams] = useSearchParams()
-  const catalog = useMemo(() => loadCatalogConfig(), [])
+  const [catalog, setCatalog] = useState(() => loadCatalogConfig())
+
+  useEffect(() => {
+    let cancelled = false
+    loadCatalogConfigAsync().then((loaded) => {
+      if (!cancelled && loaded) setCatalog(loaded)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const enabledTypes = useMemo(() => {
     const enabledIds = new Set(catalog.patchTypes.filter((t) => t.enabled).map((t) => t.id))

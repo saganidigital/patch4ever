@@ -2,9 +2,9 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-function localAdminApiPlugin() {
+function localApiPlugin() {
   return {
-    name: 'local-admin-api',
+    name: 'local-api',
     configureServer(server) {
       const env = loadEnv(server.config.mode, process.cwd(), '')
       for (const [k, v] of Object.entries(env)) {
@@ -19,6 +19,9 @@ function localAdminApiPlugin() {
           '/api/admin/login': () => import('./api/admin/login.js'),
           '/api/admin/session': () => import('./api/admin/session.js'),
           '/api/admin/logout': () => import('./api/admin/logout.js'),
+          '/api/orders': () => import('./api/orders.js'),
+          '/api/catalog': () => import('./api/catalog.js'),
+          '/api/newsletter': () => import('./api/newsletter.js'),
         }
 
         const loader = routes[urlPath]
@@ -44,7 +47,7 @@ function localAdminApiPlugin() {
           res.statusCode = 500
           res.setHeader('Content-Type', 'application/json; charset=utf-8')
           res.end(JSON.stringify({ error: 'Internal server error' }))
-          console.error('[local-admin-api]', err)
+          console.error('[local-api]', err)
         }
       })
     },
@@ -52,5 +55,5 @@ function localAdminApiPlugin() {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), localAdminApiPlugin()],
+  plugins: [react(), tailwindcss(), localApiPlugin()],
 })

@@ -202,3 +202,16 @@ export async function readJsonBody(req) {
     req.on('error', () => resolve({}))
   })
 }
+
+export function requireAdmin(req) {
+  if (!isAuthConfigured()) {
+    return { ok: false, status: 503, error: 'Admin authentication is not configured on the server.' }
+  }
+  const cookies = parseCookies(req)
+  const token = cookies[COOKIE_NAME]
+  const payload = verifySessionToken(token, process.env.ADMIN_SESSION_SECRET)
+  if (!payload) {
+    return { ok: false, status: 401, error: 'Unauthorized. Please sign in as admin.' }
+  }
+  return { ok: true, payload }
+}
