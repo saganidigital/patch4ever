@@ -27,6 +27,12 @@ function localApiPlugin() {
         const loader = routes[urlPath]
         if (!loader) return next()
 
+        // Reload .env on each local API call so env edits apply immediately
+        const freshEnv = loadEnv(server.config.mode, process.cwd(), '')
+        for (const [k, v] of Object.entries(freshEnv)) {
+          process.env[k] = v
+        }
+
         const wrappedRes = res
         wrappedRes.status = (code) => {
           res.statusCode = code
