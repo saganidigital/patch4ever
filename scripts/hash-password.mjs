@@ -8,7 +8,7 @@ function generate(password) {
   }
   const salt = crypto.randomBytes(16)
   const key = crypto.scryptSync(password, salt, 64)
-  const passwordHash = `scrypt$${salt.toString('hex')}$${key.toString('hex')}`
+  const passwordHash = `scrypt:${salt.toString('hex')}:${key.toString('hex')}`
   const sessionSecret = crypto.randomBytes(32).toString('hex')
 
   console.log('\nAdd these environment variables to Vercel (Project Settings -> Environment Variables) and .env.local:\n')

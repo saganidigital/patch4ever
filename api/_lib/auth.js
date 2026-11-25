@@ -59,7 +59,7 @@ export function verifyPassword(password, envPassword, envPasswordHash) {
   if (typeof password !== 'string' || password.length === 0) return false
 
   if (typeof envPasswordHash === 'string' && envPasswordHash.trim()) {
-    const match = /^scrypt\$([0-9a-f]+)\$([0-9a-f]+)$/i.exec(envPasswordHash.trim())
+    const match = /^scrypt[:$]([0-9a-f]+)[:$]([0-9a-f]+)$/i.exec(envPasswordHash.trim())
     if (!match) return false
     try {
       const salt = Buffer.from(match[1], 'hex')
@@ -82,7 +82,7 @@ export function verifyPassword(password, envPassword, envPasswordHash) {
 export function hashPasswordScrypt(password) {
   const salt = crypto.randomBytes(16)
   const key = crypto.scryptSync(password, salt, 64)
-  return `scrypt$${salt.toString('hex')}$${key.toString('hex')}`
+  return `scrypt:${salt.toString('hex')}:${key.toString('hex')}`
 }
 
 export function signSessionToken(payload, secret) {
