@@ -1,4 +1,4 @@
--- Patch4Ever Initial Seed Data (Optional — safe to re-run)
+
 
 insert into public.catalog_config (id, config)
 values (

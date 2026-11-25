@@ -1,5 +1,4 @@
--- Patch4Ever Supabase PostgreSQL Schema
--- Run this script once in the Supabase SQL Editor (Dashboard -> SQL Editor -> New Query)
+
 
 create extension if not exists pgcrypto;
 

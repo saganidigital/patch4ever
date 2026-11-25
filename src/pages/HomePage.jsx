@@ -106,17 +106,9 @@ export default function HomePage({ onOpenVideo }) {
               <div className="drop-shadow-[0_22px_24px_rgba(0,0,0,0.45)]">
                 <img
                   src={ASSETS.miscPatchStyles}
-                  alt="A pile of custom patches: a round 'The Distinguished Gentleman's Ride' patch, an orange spiral, a red shield with a golden eagle crest, a knight's helmet on red and black, and a white stitched bunny face."
-                  title="Various Custom Patch Styles"
-                  style={
-                    ASSETS.maskPatchStyles
-                      ? {
-                          WebkitMaskImage: `url(${ASSETS.maskPatchStyles})`,
-                          maskImage: `url(${ASSETS.maskPatchStyles})`,
-                        }
-                      : undefined
-                  }
-                  className="patch-cutout-mask mx-auto h-auto w-full max-w-[340px] sm:max-w-md lg:max-w-[40rem]"
+                  alt="A custom cluster of five Patch4Ever patches: a round navy and crimson PATCH4EVER EST. 2003 embroidered compass patch, a burnt-orange flame lightning patch, a crimson and gold mountain crest shield, a laser-engraved geometric wolf leather hexagon, and a black-bordered retro skull-helmet mascot patch."
+                  title="Custom Patch4Ever Patch Styles"
+                  className="mx-auto h-auto w-full max-w-[340px] sm:max-w-md lg:max-w-[40rem]"
                 />
               </div>
             </div>

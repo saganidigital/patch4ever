@@ -3,7 +3,7 @@ export const ASSETS = {
   "bgTwillLight": "/assets/background-p4l-light.webp",
   "bgTwillDark": "/assets/background-p4l-dark.webp",
   "wallOPatches": "/assets/hero-patch-wall.webp",
-  "miscPatchStyles": "/assets/misc-patch-styles.webp",
+  "miscPatchStyles": "/assets/hero-patch-cluster.webp",
   "typeEmbroidered": "/assets/types/embroidered.webp",
   "typeWoven": "/assets/types/woven.webp",
   "typePvc": "/assets/types/pvc.webp",
