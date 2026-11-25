@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import {
   Check,
   CheckCircle2,
@@ -227,16 +227,10 @@ export default function OrderPage({ onAddToCart }) {
             <button
               type="button"
               onClick={() => setPlacedOrder(null)}
-              className="cursor-pointer rounded-full bg-accent px-7 py-3 font-heading text-base font-black text-white uppercase shadow hover:bg-accent-600"
+              className="cursor-pointer rounded-full bg-accent px-8 py-3.5 font-heading text-base font-black text-white uppercase shadow-md transition hover:bg-accent-600"
             >
               Build Another Patch Order
             </button>
-            <Link
-              to="/admin"
-              className="rounded-full bg-primary-800 px-7 py-3 font-heading text-base font-bold text-white uppercase no-underline shadow hover:bg-primary-900"
-            >
-              View in Admin Panel →
-            </Link>
           </div>
         </div>
       ) : (
