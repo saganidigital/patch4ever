@@ -7,6 +7,8 @@ import VideoModal from './components/VideoModal'
 import HomePage from './pages/HomePage'
 import QuotePage from './pages/QuotePage'
 import PricingPage from './pages/PricingPage'
+import OrderPage from './pages/OrderPage'
+import AdminPage from './pages/AdminPage'
 import CatalogPage from './pages/CatalogPage'
 
 function ScrollToTop() {
@@ -25,6 +27,8 @@ function ScrollToTop() {
 }
 
 function AppShell() {
+  const { pathname } = useLocation()
+  const isAdmin = pathname.startsWith('/admin')
   const [darkMode, setDarkMode] = useState(() => {
     try {
       return document.documentElement.classList.contains('dark')
@@ -79,23 +83,28 @@ function AppShell() {
   return (
     <div className="flex min-h-screen flex-col">
       <ScrollToTop />
-      <Header
-        darkMode={darkMode}
-        onToggleDark={toggleDark}
-        cartCount={cartCount}
-        onOpenCart={() => setCartOpen(true)}
-      />
+      {!isAdmin && (
+        <Header
+          darkMode={darkMode}
+          onToggleDark={toggleDark}
+          cartCount={cartCount}
+          onOpenCart={() => setCartOpen(true)}
+        />
+      )}
 
       <div className="flex-1">
         <Routes>
           <Route path="/" element={<HomePage onOpenVideo={setActiveVideo} />} />
+          <Route path="/make-your-own-patches" element={<OrderPage onAddToCart={handleAddToCart} />} />
+          <Route path="/order" element={<OrderPage onAddToCart={handleAddToCart} />} />
           <Route path="/quote" element={<QuotePage />} />
           <Route path="/pricing" element={<PricingPage onAddToCart={handleAddToCart} />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="*" element={<CatalogPage onAddToCart={handleAddToCart} />} />
         </Routes>
       </div>
 
-      <Footer />
+      {!isAdmin && <Footer />}
 
       <CartDrawer
         open={cartOpen}

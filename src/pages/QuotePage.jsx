@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Check, CheckCircle2, Mail, Phone, Upload, X } from 'lucide-react'
 import { CONTACT, PATCH_TYPES } from '../data/siteData'
+import { lookupUnitPrice } from '../data/pricingData'
+import { createOrder } from '../data/orderStore'
 
 const DIMENSIONS = ['0.50', '1.00', '1.50', '2.00', '2.50', '3.00', '3.50', '4.00', '4.50', '5.00', '6.00', '7.00', '8.00', '10.00', '12.00']
 const QUICK_SIZES = ['2', '2.5', '3', '3.5', '4']
@@ -66,6 +68,31 @@ export default function QuotePage() {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!fullName.trim() || !email.trim()) return
+    const unitPrice = lookupUnitPrice({ patchType, sizeInches: Number(avgSize), qty })
+    createOrder({
+      source: 'Free Quote',
+      patchType,
+      shape: 'Custom',
+      width,
+      height,
+      size: Number(avgSize),
+      coverage: patchType === 'embroidered' ? coverage : 'Standard',
+      border,
+      backing,
+      upgrades: addons,
+      qty,
+      rush: false,
+      unitPrice,
+      totalPrice: Number((unitPrice * qty).toFixed(2)),
+      customerName: fullName.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      company: company.trim(),
+      address: '',
+      inHandsDate,
+      artworkName: files.map((f) => f.name).join(', ') || 'No file uploaded',
+      notes: notes.trim(),
+    })
     setSubmitted(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
